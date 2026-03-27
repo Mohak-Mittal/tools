@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Merger — ToolZone</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="../../index.html" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </a>
+      <a class="logo" href="../../index.html">⚡ ToolZone</a>
+      <span class="nav-badge">Free · No Signup</span>
+    </div>
+  </nav>
+
+  <!-- TOOL HEADER -->
+  <div class="tool-header">
+    <div class="tool-header-inner">
+      <div class="tool-title-row">
+        <span class="tool-big-icon">🔗</span>
+        <div>
+          <h1 class="tool-title">PDF Merger</h1>
+          <p class="tool-desc">Combine multiple PDF files into one. Drag to reorder. No upload to server — 100% in your browser.</p>
+        </div>
+      </div>
+      <div class="feature-pills">
+        <span class="fpill">✅ No file size limit</span>
+        <span class="fpill">✅ No watermark</span>
+        <span class="fpill">✅ No signup</span>
+        <span class="fpill">✅ Files never leave your device</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- STEP 1: Upload -->
+    <div class="card" id="uploadCard">
+      <div class="card-label">
+        <span class="step-num">1</span>
+        Add PDF Files
+      </div>
+
+      <!-- Drop Zone -->
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-inner" id="dropZoneInner">
+          <span class="drop-icon">📂</span>
+          <p class="drop-title">Drag & Drop PDF files here</p>
+          <p class="drop-sub">or</p>
+          <label class="btn btn-primary" for="fileInput">
+            Browse Files
+          </label>
+          <input type="file" id="fileInput" accept=".pdf,application/pdf" multiple hidden />
+          <p class="drop-hint">You can add as many PDFs as you want</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: File List -->
+    <div class="card" id="fileListCard" style="display:none;">
+      <div class="card-label">
+        <span class="step-num">2</span>
+        Arrange Order
+        <span class="card-label-hint">Drag rows to reorder · They will merge in this order</span>
+      </div>
+
+      <div class="file-list" id="fileList"></div>
+
+      <div class="file-list-footer">
+        <label class="btn btn-outline" for="addMoreInput">
+          ＋ Add More PDFs
+        </label>
+        <input type="file" id="addMoreInput" accept=".pdf,application/pdf" multiple hidden />
+        <span class="total-info" id="totalInfo"></span>
+        <button class="btn btn-danger-soft" id="clearAllBtn">🗑 Clear All</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Options + Merge -->
+    <div class="card" id="mergeCard" style="display:none;">
+      <div class="card-label">
+        <span class="step-num">3</span>
+        Options & Merge
+      </div>
+
+      <div class="options-grid">
+        <div class="option-group">
+          <label class="option-label" for="outputName">Output File Name</label>
+          <div class="input-with-ext">
+            <input type="text" id="outputName" class="text-input" value="merged" placeholder="merged" />
+            <span class="ext">.pdf</span>
+          </div>
+        </div>
+        <div class="option-group">
+          <label class="option-label">Page Order</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="pageOrder" value="normal" checked />
+              <span>Normal (1, 2, 3...)</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="pageOrder" value="reverse" />
+              <span>Reversed per file</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="merge-action">
+        <button class="btn btn-merge" id="mergeBtn">
+          <span id="mergeBtnIcon">🔗</span>
+          <span id="mergeBtnText">Merge PDFs</span>
+        </button>
+        <p class="merge-hint" id="mergeHint"></p>
+      </div>
+
+      <!-- PROGRESS -->
+      <div class="progress-wrap" id="progressWrap" style="display:none;">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <p class="progress-label" id="progressLabel">Processing...</p>
+      </div>
+    </div>
+
+    <!-- STEP 4: Download -->
+    <div class="card card-success" id="downloadCard" style="display:none;">
+      <div class="success-icon">✅</div>
+      <h2 class="success-title">Merge Complete!</h2>
+      <p class="success-sub" id="successInfo"></p>
+      <div class="download-actions">
+        <button class="btn btn-download" id="downloadBtn">
+          💾 Download Merged PDF
+        </button>
+        <button class="btn btn-outline" id="mergeAgainBtn">
+          🔄 Merge Again
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <span>⚡ ToolZone · PDF Merger · 100% Free · No data sent to any server</span>
+  </footer>
+
+  <!-- pdf-lib CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
