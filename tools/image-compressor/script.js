@@ -1,36 +1,52 @@
-// ─── IMAGE COMPRESSOR — script.js ────────────────────────────────────────────
-// Features: drag & drop, batch compress, quality slider, format convert,
-//           resize (aspect-ratio safe), per-image download, ZIP all, live stats
+// ── IMAGE COMPRESSOR script.js ──────────────────────────────────
 
-// ─── STATE ───────────────────────────────────────────────────────────────────
 let images = [];
+let selectedId = null;
 let selectedFormat = 'same';
 
-// ─── DOM ─────────────────────────────────────────────────────────────────────
+// DOM
 const dropZone       = document.getElementById('dropZone');
 const fileInput      = document.getElementById('fileInput');
 const addMoreInput   = document.getElementById('addMoreInput');
-const settingsCard   = document.getElementById('settingsCard');
-const resultsCard    = document.getElementById('resultsCard');
-const imageListEl    = document.getElementById('imageList');
-const qualitySlider  = document.getElementById('qualitySlider');
-const qualityVal     = document.getElementById('qualityVal');
-const compressAllBtn = document.getElementById('compressAllBtn');
+const queueList      = document.getElementById('queueList');
+const queueCount     = document.getElementById('queueCount');
+const compressBtn    = document.getElementById('compressBtn');
 const clearAllBtn    = document.getElementById('clearAllBtn');
 const downloadAllBtn = document.getElementById('downloadAllBtn');
-const doneCount      = document.getElementById('doneCount');
-const summaryBar     = document.getElementById('summaryBar');
-const fileCountLabel = document.getElementById('fileCountLabel');
+const qualitySlider  = document.getElementById('qualitySlider');
+const qualityVal     = document.getElementById('qualityVal');
+const perQSlider     = document.getElementById('perQSlider');
+const perQVal        = document.getElementById('perQVal');
+const tbStatus       = document.getElementById('tbStatus');
+const statusMsg      = document.getElementById('statusMsg');
 const maxWidthInput  = document.getElementById('maxWidth');
 const maxHeightInput = document.getElementById('maxHeight');
+const summarySection = document.getElementById('summarySection');
+const perImageSection= document.getElementById('perImageSection');
+const perImageName   = document.getElementById('perImageName');
+const emptyState     = document.getElementById('emptyState');
+const previewContent = document.getElementById('previewContent');
+const previewSaving  = document.getElementById('previewSaving');
+const previewLabel   = document.getElementById('previewLabel');
 
-// ─── QUALITY SLIDER ──────────────────────────────────────────────────────────
-qualitySlider.addEventListener('input', () => {
-  qualityVal.textContent = qualitySlider.value + '%';
+// ── QUALITY SLIDERS ──────────────────────────────────────────────
+qualitySlider.addEventListener('input', () => { qualityVal.textContent = qualitySlider.value + '%'; });
+perQSlider.addEventListener('input', () => {
+  perQVal.textContent = perQSlider.value + '%';
+  const img = images.find(i => i.id === selectedId);
+  if (img) { img.customQuality = parseInt(perQSlider.value); img.status = 'pending'; patchQueueItem(img); }
+});
+document.getElementById('resetPerQBtn').addEventListener('click', () => {
+  const img = images.find(i => i.id === selectedId);
+  if (!img) return;
+  img.customQuality = null; img.status = 'pending'; patchQueueItem(img);
+  perQSlider.value = qualitySlider.value;
+  perQVal.textContent = qualitySlider.value + '%';
+  toast('Reset to global quality.');
 });
 
-// ─── FORMAT BUTTONS ──────────────────────────────────────────────────────────
-document.getElementById('formatBtns').addEventListener('click', e => {
+// ── FORMAT BUTTONS ───────────────────────────────────────────────
+document.getElementById('fmtGrid').addEventListener('click', e => {
   const btn = e.target.closest('.fmt-btn');
   if (!btn) return;
   document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
@@ -38,159 +54,230 @@ document.getElementById('formatBtns').addEventListener('click', e => {
   selectedFormat = btn.dataset.fmt;
 });
 
-// ─── FILE INPUT EVENTS ────────────────────────────────────────────────────────
+// ── FILE INPUT — FIX: no double dialog ───────────────────────────
 fileInput.addEventListener('change',    e => handleFiles(e.target.files));
 addMoreInput.addEventListener('change', e => handleFiles(e.target.files));
-dropZone.addEventListener('click', () => fileInput.click());
+
+dropZone.addEventListener('click', e => {
+  if (e.target.closest('label') || e.target.tagName === 'INPUT') return;
+  fileInput.click();
+});
 dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragging'); });
 dropZone.addEventListener('dragleave', e => { if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('dragging'); });
 dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('dragging');
+  e.preventDefault(); dropZone.classList.remove('dragging');
   handleFiles(e.dataTransfer.files);
 });
 
-// ─── HANDLE FILES ─────────────────────────────────────────────────────────────
-async function handleFiles(rawFiles) {
-  const valid = Array.from(rawFiles).filter(f =>
-    ['image/jpeg','image/png','image/webp'].includes(f.type)
-  );
-  if (!valid.length) { showToast('Only JPG, PNG and WebP images are supported.'); return; }
+compressBtn.addEventListener('click',   compressAll);
+clearAllBtn.addEventListener('click',   clearAll);
+downloadAllBtn.addEventListener('click', downloadZip);
+
+// ── HANDLE FILES ─────────────────────────────────────────────────
+async function handleFiles(raw) {
+  const valid = Array.from(raw).filter(f => ['image/jpeg','image/png','image/webp'].includes(f.type));
+  if (!valid.length) { toast('Only JPG, PNG and WebP are supported.'); return; }
 
   for (const f of valid) {
-    const id       = uid();
-    const thumbUrl = URL.createObjectURL(f);
-    const dims     = await getImageDimensions(f);
+    const dims = await getDims(f);
     images.push({
-      id, file: f, name: f.name, origSize: f.size,
-      origW: dims.w, origH: dims.h,
+      id: uid(), file: f, name: f.name,
+      origSize: f.size, origW: dims.w, origH: dims.h,
       status: 'pending',
       compressedBlob: null, compressedSize: 0, compW: 0, compH: 0,
-      thumbUrl
+      thumbUrl: URL.createObjectURL(f),
+      customQuality: null
     });
   }
-
-  settingsCard.style.display = 'block';
-  resultsCard.style.display  = 'block';
-  renderImageList();
-  updateFileCountLabel();
+  renderQueue();
+  updateUI();
 }
 
-// ─── RENDER IMAGE LIST ────────────────────────────────────────────────────────
-function renderImageList() {
-  imageListEl.innerHTML = '';
-  images.forEach(img => imageListEl.appendChild(buildItem(img)));
-  updateDoneCount();
-  updateSummaryBar();
+// ── RENDER QUEUE ─────────────────────────────────────────────────
+function renderQueue() {
+  const hasImages = images.length > 0;
+  dropZone.style.display  = hasImages ? 'none' : 'flex';
+  queueList.style.display = hasImages ? 'flex' : 'none';
+  queueList.innerHTML = '';
+
+  images.forEach(img => {
+    const item = document.createElement('div');
+    item.id        = 'qi-' + img.id;
+    item.className = 'qi' + (img.id === selectedId ? ' selected' : '') + (img.status !== 'pending' ? ' ' + img.status : '');
+
+    const savingHTML = img.status === 'done' ? (() => {
+      const pct  = Math.round((1 - img.compressedSize / img.origSize) * 100);
+      const good = pct >= 0;
+      return `<span class="qi-saving ${good ? 'good' : 'bad'}">${good ? '-' : '+'}${Math.abs(pct)}%</span>`;
+    })() : '';
+
+    const statusHTML = img.status === 'processing'
+      ? `<span class="spin-ring"></span>`
+      : img.status === 'error' ? `<span style="color:#e05c5c;font-size:10px;">✕ Error</span>` : '';
+
+    item.innerHTML = `
+      <img class="qi-thumb" src="${esc(img.thumbUrl)}" alt="" />
+      <div class="qi-info">
+        <div class="qi-name">${esc(img.name)}</div>
+        <div class="qi-meta">
+          ${fmtBytes(img.origSize)}
+          ${img.status === 'done' ? `→ ${fmtBytes(img.compressedSize)}` : `· ${img.origW}×${img.origH}`}
+          ${savingHTML}
+          ${statusHTML}
+          ${img.customQuality !== null ? `<span style="color:var(--accent);font-size:9px;font-weight:700;">Q:${img.customQuality}%</span>` : ''}
+        </div>
+      </div>
+      ${img.status === 'done' ? `<button class="qi-dl" onclick="dlSingle('${img.id}')">💾</button>` : ''}
+      <button class="qi-rm" onclick="removeImg('${img.id}')">✕</button>
+    `;
+
+    item.addEventListener('click', e => {
+      if (e.target.closest('button')) return;
+      selectedId = (selectedId === img.id) ? null : img.id;
+      renderQueue();
+      renderPreview();
+      renderPerImageSection();
+    });
+
+    queueList.appendChild(item);
+  });
+
+  queueCount.textContent = images.length ? `${images.length} image${images.length !== 1 ? 's' : ''}` : '0 images';
 }
 
-function buildItem(img) {
-  const item       = document.createElement('div');
-  item.id          = 'img-' + img.id;
-  item.className   = 'img-item ' + (img.status === 'done' ? 'done' : img.status === 'error' ? 'errored' : '');
+// ── PATCH SINGLE QUEUE ITEM ───────────────────────────────────────
+function patchQueueItem(img) {
+  const el = document.getElementById('qi-' + img.id);
+  if (!el) return;
+  el.className = 'qi' + (img.id === selectedId ? ' selected' : '') + (img.status !== 'pending' ? ' ' + img.status : '');
 
-  const thumbHTML  = img.thumbUrl
-    ? `<img class="img-thumb" src="${escHtml(img.thumbUrl)}" alt="" />`
-    : `<span class="img-thumb-placeholder">🖼️</span>`;
-
-  item.innerHTML = `
-    <div class="img-thumb-wrap">${thumbHTML}</div>
-    <div class="img-info">
-      <div class="img-name" title="${escHtml(img.name)}">${escHtml(img.name)}</div>
-      <div class="img-meta-row">${buildMeta(img)}</div>
-    </div>
-    <div class="img-actions">${buildActions(img)}</div>
-  `;
-  return item;
-}
-
-function buildMeta(img) {
-  if (img.status === 'done') {
-    const saved = img.origSize - img.compressedSize;
-    const pct   = Math.round((saved / img.origSize) * 100);
-    return `
-      <span class="img-size-orig">${fmtBytes(img.origSize)}</span>
-      <span class="img-arrow">→</span>
-      <span class="img-size-comp">${fmtBytes(img.compressedSize)}</span>
-      <span class="img-savings ${saved < 0 ? 'worse' : ''}">${saved < 0 ? '+' : '-'}${Math.abs(pct)}%</span>
-      <span class="img-dim">${img.compW}×${img.compH}px</span>
+  const meta = el.querySelector('.qi-meta');
+  if (meta) {
+    const savingHTML = img.status === 'done' ? (() => {
+      const pct = Math.round((1 - img.compressedSize / img.origSize) * 100);
+      return `<span class="qi-saving ${pct >= 0 ? 'good' : 'bad'}">${pct >= 0 ? '-' : '+'}${Math.abs(pct)}%</span>`;
+    })() : '';
+    meta.innerHTML = `
+      ${fmtBytes(img.origSize)}
+      ${img.status === 'done' ? `→ ${fmtBytes(img.compressedSize)}` : `· ${img.origW}×${img.origH}`}
+      ${savingHTML}
+      ${img.status === 'processing' ? '<span class="spin-ring"></span>' : ''}
+      ${img.customQuality !== null ? `<span style="color:var(--accent);font-size:9px;font-weight:700;">Q:${img.customQuality}%</span>` : ''}
     `;
   }
-  if (img.status === 'processing') return `<span class="img-status processing"><span class="spin-ring"></span>Compressing...</span>`;
-  if (img.status === 'error')      return `<span class="img-status errored">❌ Failed</span>`;
-  return `<span class="img-size-orig">${fmtBytes(img.origSize)}</span><span class="img-dim">${img.origW}×${img.origH}px</span>`;
 }
 
-function buildActions(img) {
-  if (img.status === 'done')
-    return `<button class="btn btn-dl" onclick="downloadSingle('${img.id}')">💾 Download</button>
-            <button class="btn-sm" onclick="removeImage('${img.id}')">✕ Remove</button>`;
-  if (img.status === 'processing') return '';
-  return `<button class="btn-sm" onclick="removeImage('${img.id}')">✕ Remove</button>`;
+// ── RENDER PREVIEW ────────────────────────────────────────────────
+function renderPreview() {
+  const img = images.find(i => i.id === selectedId);
+  if (!img) {
+    emptyState.style.display   = 'flex';
+    previewContent.style.display = 'none';
+    previewLabel.textContent   = 'Select an image to preview';
+    return;
+  }
+
+  emptyState.style.display   = 'none';
+  previewContent.style.display = 'flex';
+  previewLabel.textContent   = img.name;
+
+  document.getElementById('prevOrig').src = img.thumbUrl;
+  document.getElementById('prevOrigInfo').textContent = `${fmtBytes(img.origSize)} · ${img.origW}×${img.origH}px`;
+
+  if (img.status === 'done' && img.compressedBlob) {
+    const url = URL.createObjectURL(img.compressedBlob);
+    document.getElementById('prevComp').src = url;
+    document.getElementById('prevCompInfo').textContent = `${fmtBytes(img.compressedSize)} · ${img.compW}×${img.compH}px`;
+
+    const saved = img.origSize - img.compressedSize;
+    const pct   = Math.round((saved / img.origSize) * 100);
+    previewSaving.style.display = 'flex';
+    document.getElementById('savingVal').textContent = `${pct >= 0 ? '-' : '+'}${Math.abs(pct)}%`;
+    document.getElementById('savingVal').style.color = pct >= 0 ? 'var(--green2)' : '#e05c5c';
+  } else {
+    document.getElementById('prevComp').src = '';
+    document.getElementById('prevCompInfo').textContent = img.status === 'processing' ? '⏳ Compressing...' : 'Not yet compressed';
+    previewSaving.style.display = 'none';
+  }
 }
 
-// ─── COMPRESS ALL ─────────────────────────────────────────────────────────────
-compressAllBtn.addEventListener('click', compressAll);
+// ── PER-IMAGE SECTION ────────────────────────────────────────────
+function renderPerImageSection() {
+  const img = images.find(i => i.id === selectedId);
+  perImageSection.style.display = img ? 'block' : 'none';
+  if (!img) return;
+  perImageName.textContent = img.name;
+  const q = img.customQuality !== null ? img.customQuality : parseInt(qualitySlider.value);
+  perQSlider.value = q;
+  perQVal.textContent = q + '%';
+}
 
+// ── COMPRESS ALL — FIX: always reset then recompress ─────────────
 async function compressAll() {
-  if (!images.length) { showToast('No images to compress.'); return; }
+  if (!images.length) { toast('No images to compress.'); return; }
 
   const quality = parseInt(qualitySlider.value) / 100;
   const maxW    = parseInt(maxWidthInput.value)  || null;
   const maxH    = parseInt(maxHeightInput.value) || null;
 
-  compressAllBtn.disabled    = true;
-  compressAllBtn.textContent = '⏳ Compressing...';
+  // FIX: reset ALL to pending so re-compress always works
+  images.forEach(img => { img.status = 'pending'; img.compressedBlob = null; img.compressedSize = 0; });
+  renderQueue();
+
+  compressBtn.disabled    = true;
+  compressBtn.textContent = '⏳ Compressing...';
   downloadAllBtn.style.display = 'none';
 
   for (const img of images) {
-    if (img.status === 'done') continue;
     img.status = 'processing';
-    patchItem(img);
+    patchQueueItem(img);
 
     try {
-      const result        = await compressImage(img.file, quality, maxW, maxH);
-      img.status          = 'done';
-      img.compressedBlob  = result.blob;
-      img.compressedSize  = result.blob.size;
-      img.compW           = result.w;
-      img.compH           = result.h;
+      const q      = img.customQuality !== null ? img.customQuality / 100 : quality;
+      const result = await compressOne(img.file, q, maxW, maxH);
+      img.status         = 'done';
+      img.compressedBlob = result.blob;
+      img.compressedSize = result.blob.size;
+      img.compW          = result.w;
+      img.compH          = result.h;
     } catch {
       img.status = 'error';
     }
 
-    patchItem(img);
-    updateSummaryBar();
-    updateDoneCount();
+    patchQueueItem(img);
+    if (img.id === selectedId) renderPreview();
+    updateSummary();
   }
 
-  compressAllBtn.disabled    = false;
-  compressAllBtn.textContent = '🗜️ Re-Compress All';
+  compressBtn.disabled    = false;
+  compressBtn.textContent = '🗜️ Compress All';
 
-  if (images.filter(i => i.status === 'done').length > 1)
-    downloadAllBtn.style.display = 'inline-flex';
+  const doneCount = images.filter(i => i.status === 'done').length;
+  if (doneCount > 1) downloadAllBtn.style.display = 'inline-flex';
+
+  statusMsg.textContent = `✅ Done — ${doneCount}/${images.length} compressed`;
+  tbStatus.textContent  = `${doneCount} compressed`;
+  renderQueue();
 }
 
-// ─── COMPRESS SINGLE IMAGE (canvas) ──────────────────────────────────────────
-function compressImage(file, quality, maxW, maxH) {
+// ── COMPRESS ONE ─────────────────────────────────────────────────
+function compressOne(file, quality, maxW, maxH) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = reject;
     reader.onload  = e => {
-      const img    = new Image();
-      img.onerror  = reject;
-      img.onload   = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload  = () => {
         const { w, h } = calcDims(img.width, img.height, maxW, maxH);
-        const canvas   = document.createElement('canvas');
-        canvas.width   = w;
-        canvas.height  = h;
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         const mime = selectedFormat === 'same' ? file.type : selectedFormat;
-        const q    = mime === 'image/png' ? 1 : quality;
         canvas.toBlob(blob => {
           if (!blob) { reject(new Error('toBlob failed')); return; }
           resolve({ blob, w, h });
-        }, mime, q);
+        }, mime, mime === 'image/png' ? 1 : quality);
       };
       img.src = e.target.result;
     };
@@ -198,150 +285,119 @@ function compressImage(file, quality, maxW, maxH) {
   });
 }
 
-// ─── ASPECT-RATIO SAFE DIMENSIONS ────────────────────────────────────────────
-function calcDims(origW, origH, maxW, maxH) {
-  let w = origW, h = origH;
+function calcDims(w, h, maxW, maxH) {
   if (!maxW && !maxH) return { w, h };
   if (maxW && w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
   if (maxH && h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
   return { w, h };
 }
 
-// ─── PATCH SINGLE ITEM DOM (no full re-render) ───────────────────────────────
-function patchItem(img) {
-  const item = document.getElementById('img-' + img.id);
-  if (!item) return;
-  item.className = 'img-item ' + (img.status === 'done' ? 'done' : img.status === 'error' ? 'errored' : '');
-  item.querySelector('.img-meta-row').innerHTML = buildMeta(img);
-  item.querySelector('.img-actions').innerHTML  = buildActions(img);
-}
-
-// ─── DOWNLOAD SINGLE ─────────────────────────────────────────────────────────
-function downloadSingle(id) {
+// ── DOWNLOAD SINGLE ──────────────────────────────────────────────
+function dlSingle(id) {
   const img = images.find(i => i.id === id);
-  if (!img || !img.compressedBlob) return;
+  if (!img?.compressedBlob) return;
   const ext  = img.compressedBlob.type.split('/')[1].replace('jpeg','jpg') || 'jpg';
-  const base = img.name.replace(/\.[^.]+$/, '');
-  const url  = URL.createObjectURL(img.compressedBlob);
-  const a    = Object.assign(document.createElement('a'), { href: url, download: `${base}_compressed.${ext}` });
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(img.compressedBlob),
+    download: img.name.replace(/\.[^.]+$/, '') + '_compressed.' + ext
+  });
   a.click();
-  URL.revokeObjectURL(url);
 }
 
-// ─── DOWNLOAD ALL AS ZIP ─────────────────────────────────────────────────────
-downloadAllBtn.addEventListener('click', async () => {
+// ── DOWNLOAD ZIP ─────────────────────────────────────────────────
+async function downloadZip() {
   const done = images.filter(i => i.status === 'done');
-  if (!done.length) { showToast('No compressed images yet.'); return; }
-
+  if (!done.length) { toast('No compressed images yet.'); return; }
   downloadAllBtn.textContent = '⏳ Zipping...';
-  downloadAllBtn.disabled    = true;
+  downloadAllBtn.disabled = true;
 
   const zip = new JSZip();
   done.forEach(img => {
     const ext  = img.compressedBlob.type.split('/')[1].replace('jpeg','jpg') || 'jpg';
-    const base = img.name.replace(/\.[^.]+$/, '');
-    zip.file(`${base}_compressed.${ext}`, img.compressedBlob);
+    zip.file(img.name.replace(/\.[^.]+$/, '') + '_compressed.' + ext, img.compressedBlob);
   });
 
   const blob = await zip.generateAsync({ type: 'blob' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), { href: url, download: 'toolzone_compressed.zip' });
-  a.click();
-  URL.revokeObjectURL(url);
+  Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'toolzone_compressed.zip' }).click();
 
-  downloadAllBtn.textContent = '📦 Download All (ZIP)';
-  downloadAllBtn.disabled    = false;
-});
+  downloadAllBtn.textContent = '📦 Download ZIP';
+  downloadAllBtn.disabled = false;
+}
 
-// ─── REMOVE IMAGE ─────────────────────────────────────────────────────────────
-function removeImage(id) {
+// ── REMOVE ───────────────────────────────────────────────────────
+function removeImg(id) {
   images = images.filter(i => i.id !== id);
+  if (selectedId === id) { selectedId = null; renderPreview(); renderPerImageSection(); }
   if (!images.length) { clearAll(); return; }
-  renderImageList();
-  updateFileCountLabel();
+  renderQueue(); updateUI(); updateSummary();
 }
 
-// ─── CLEAR ALL ───────────────────────────────────────────────────────────────
-clearAllBtn.addEventListener('click', clearAll);
 function clearAll() {
-  images              = [];
-  fileInput.value     = '';
-  addMoreInput.value  = '';
-  settingsCard.style.display    = 'none';
-  resultsCard.style.display     = 'none';
-  downloadAllBtn.style.display  = 'none';
-  summaryBar.style.display      = 'none';
-  imageListEl.innerHTML         = '';
-  compressAllBtn.textContent    = '🗜️ Compress All';
-  compressAllBtn.disabled       = false;
+  images = []; selectedId = null;
+  fileInput.value = ''; addMoreInput.value = '';
+  downloadAllBtn.style.display = 'none';
+  summarySection.style.display = 'none';
+  perImageSection.style.display = 'none';
+  emptyState.style.display = 'flex';
+  previewContent.style.display = 'none';
+  compressBtn.textContent = '🗜️ Compress All';
+  compressBtn.disabled = false;
+  renderQueue(); updateUI();
 }
 
-// ─── SUMMARY BAR ─────────────────────────────────────────────────────────────
-function updateSummaryBar() {
+// ── SUMMARY ──────────────────────────────────────────────────────
+function updateSummary() {
   const done = images.filter(i => i.status === 'done');
-  if (!done.length) { summaryBar.style.display = 'none'; return; }
-  summaryBar.style.display = 'flex';
+  summarySection.style.display = done.length ? 'block' : 'none';
+  if (!done.length) return;
   const totalOrig = done.reduce((s, i) => s + i.origSize, 0);
   const totalComp = done.reduce((s, i) => s + i.compressedSize, 0);
   const saved     = totalOrig - totalComp;
   const pct       = Math.round((saved / totalOrig) * 100);
-  document.getElementById('sumOriginal').textContent   = fmtBytes(totalOrig);
-  document.getElementById('sumCompressed').textContent = fmtBytes(totalComp);
-  document.getElementById('sumSaved').textContent      = (saved >= 0 ? '−' : '+') + fmtBytes(Math.abs(saved));
-  document.getElementById('sumPct').textContent        = (saved >= 0 ? '−' : '+') + Math.abs(pct) + '%';
+  document.getElementById('sumOrig').textContent  = fmtBytes(totalOrig);
+  document.getElementById('sumComp').textContent  = fmtBytes(totalComp);
+  document.getElementById('sumSaved').textContent = `${pct >= 0 ? '-' : '+'}${Math.abs(pct)}% (${fmtBytes(Math.abs(saved))})`;
 }
 
-function updateDoneCount() {
-  const done = images.filter(i => i.status === 'done').length;
-  doneCount.textContent = `${done} / ${images.length} done`;
+function updateUI() {
+  const n = images.length;
+  tbStatus.textContent  = n ? `${n} image${n !== 1 ? 's' : ''} loaded` : 'No images loaded';
+  statusMsg.textContent = n ? `${n} image${n !== 1 ? 's' : ''} ready — Adjust settings then click Compress All` : 'Ready — Drop images to begin';
+  compressBtn.disabled  = n === 0;
 }
 
-function updateFileCountLabel() {
-  fileCountLabel.textContent = `${images.length} image${images.length !== 1 ? 's' : ''} added`;
-  updateDoneCount();
-}
-
-// ─── UTILS ───────────────────────────────────────────────────────────────────
-function getImageDimensions(file) {
+// ── UTILS ────────────────────────────────────────────────────────
+function getDims(file) {
   return new Promise(resolve => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload  = () => { resolve({ w: img.width,  h: img.height }); URL.revokeObjectURL(url); };
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload  = () => { resolve({ w: img.width, h: img.height }); URL.revokeObjectURL(url); };
     img.onerror = () => { resolve({ w: 0, h: 0 }); URL.revokeObjectURL(url); };
     img.src = url;
   });
 }
 
 function fmtBytes(b) {
-  if (b < 1024)    return b + ' B';
-  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-  return (b / 1048576).toFixed(2) + ' MB';
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(2) + ' MB';
 }
 
-function uid()     { return Math.random().toString(36).slice(2, 10); }
-function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function uid()  { return Math.random().toString(36).slice(2, 10); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-// ─── TOAST ───────────────────────────────────────────────────────────────────
-let toastTimer;
-function showToast(msg) {
+let toastT;
+function toast(msg) {
   let t = document.getElementById('tz-toast');
   if (!t) {
-    t    = document.createElement('div');
-    t.id = 'tz-toast';
-    t.style.cssText = [
-      'position:fixed','bottom:28px','left:50%',
-      'transform:translateX(-50%) translateY(80px)',
-      'background:#13131f','border:1px solid #7c5cfc','color:#eeeeff',
-      'padding:12px 24px','border-radius:100px','font-size:0.85rem',
-      'font-weight:600','z-index:999',
-      "transition:transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-      'white-space:nowrap','box-shadow:0 8px 32px rgba(0,0,0,0.5)',
-      "font-family:'Plus Jakarta Sans',sans-serif"
-    ].join(';');
+    t = document.createElement('div'); t.id = 'tz-toast';
+    t.style.cssText = "position:fixed;bottom:34px;left:50%;transform:translateX(-50%) translateY(60px);background:#1e1e1e;border:1px solid #7c5cfc;color:#e0e0e0;padding:9px 20px;border-radius:4px;font-size:12px;font-weight:500;z-index:999;transition:transform 0.25s ease;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;";
     document.body.appendChild(t);
   }
-  t.textContent     = msg;
+  t.textContent = msg;
   t.style.transform = 'translateX(-50%) translateY(0)';
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(80px)'; }, 3000);
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(60px)'; }, 3500);
 }
+
+// Init
+updateUI();

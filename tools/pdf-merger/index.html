@@ -1,162 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PDF Merger — ToolZone</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PDF Merger — ToolZone</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="nav-inner">
-      <a href="../../index.html" class="back-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Back
-      </a>
-      <a class="logo" href="../../index.html">⚡ ToolZone</a>
-      <span class="nav-badge">Free · No Signup</span>
-    </div>
-  </nav>
+		<!-- ── TOPBAR ─────────────────────────────────────────────── -->
+		<header class="topbar">
+			<div class="topbar-left">
+				<a href="../../index.html" class="topbar-back">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="15 18 9 12 15 6"/>
+					</svg>
+				</a>
+				<div class="topbar-divider"></div>
+				<span class="topbar-logo">⚡ ToolZone</span>
+				<div class="topbar-divider"></div>
+				<span class="topbar-tool-name">PDF Merger</span>
+			</div>
+			<div class="topbar-center">
+				<span class="topbar-badge">🔒 Files never leave your device</span>
+			</div>
+			<div class="topbar-right">
+				<button class="tb-btn" id="clearAllBtn" title="Clear all files">🗑 Clear All</button>
+				<button class="tb-btn tb-btn-primary" id="mergeBtn" disabled="">🔗 Merge PDFs</button>
+			</div>
+		</header>
 
-  <!-- TOOL HEADER -->
-  <div class="tool-header">
-    <div class="tool-header-inner">
-      <div class="tool-title-row">
-        <span class="tool-big-icon">🔗</span>
-        <div>
-          <h1 class="tool-title">PDF Merger</h1>
-          <p class="tool-desc">Combine multiple PDF files into one. Drag to reorder. No upload to server — 100% in your browser.</p>
-        </div>
-      </div>
-      <div class="feature-pills">
-        <span class="fpill">✅ No file size limit</span>
-        <span class="fpill">✅ No watermark</span>
-        <span class="fpill">✅ No signup</span>
-        <span class="fpill">✅ Files never leave your device</span>
-      </div>
-    </div>
-  </div>
+		<!-- ── MAIN LAYOUT ────────────────────────────────────────── -->
+		<div class="app-layout">
 
-  <!-- MAIN -->
-  <main class="main">
+			<!-- LEFT: File Panel -->
+			<aside class="panel panel-files">
+				<div class="panel-header">
+					<span class="panel-title">📁 Source Files</span>
+					<span class="panel-count" id="fileCount">0 files</span>
+				</div>
+				<div class="panel-body">
 
-    <!-- STEP 1: Upload -->
-    <div class="card" id="uploadCard">
-      <div class="card-label">
-        <span class="step-num">1</span>
-        Add PDF Files
-      </div>
+					<!-- Drop Zone (shown when empty) -->
+					<div class="drop-zone" id="dropZone">
+						<div class="dz-inner">
+							<div class="dz-icon">📄</div>
+							<p class="dz-title">Drop PDF files here</p>
+							<p class="dz-sub">or click to browse</p>
+							<label class="dz-btn" for="fileInput">Choose Files</label>
+							<input type="file" id="fileInput" accept=".pdf,application/pdf" multiple="" hidden="" />
+						</div>
+					</div>
 
-      <!-- Drop Zone -->
-      <div class="drop-zone" id="dropZone">
-        <div class="drop-zone-inner" id="dropZoneInner">
-          <span class="drop-icon">📂</span>
-          <p class="drop-title">Drag & Drop PDF files here</p>
-          <p class="drop-sub">or</p>
-          <label class="btn btn-primary" for="fileInput">
-            Browse Files
-          </label>
-          <input type="file" id="fileInput" accept=".pdf,application/pdf" multiple hidden />
-          <p class="drop-hint">You can add as many PDFs as you want</p>
-        </div>
-      </div>
-    </div>
+					<!-- File List (shown when files added) -->
+					<div class="file-list" id="fileList" style="display:none;"></div>
 
-    <!-- STEP 2: File List -->
-    <div class="card" id="fileListCard" style="display:none;">
-      <div class="card-label">
-        <span class="step-num">2</span>
-        Arrange Order
-        <span class="card-label-hint">Drag rows to reorder · They will merge in this order</span>
-      </div>
+				</div>
+				<div class="panel-footer">
+					<label class="fp-btn" for="addMoreInput">＋ Add PDFs</label>
+					<input type="file" id="addMoreInput" accept=".pdf,application/pdf" multiple="" hidden="" />
+					<span class="fp-info" id="totalInfo"></span>
+				</div>
+			</aside>
 
-      <div class="file-list" id="fileList"></div>
+			<!-- CENTER: Preview / Progress -->
+			<main class="panel panel-center">
+				<div class="panel-header">
+					<span class="panel-title">⚙️ Merge Preview</span>
+					<span class="panel-count" id="mergeStatus">No files added</span>
+				</div>
+				<div class="panel-body center-body" id="centerBody">
 
-      <div class="file-list-footer">
-        <label class="btn btn-outline" for="addMoreInput">
-          ＋ Add More PDFs
-        </label>
-        <input type="file" id="addMoreInput" accept=".pdf,application/pdf" multiple hidden />
-        <span class="total-info" id="totalInfo"></span>
-        <button class="btn btn-danger-soft" id="clearAllBtn">🗑 Clear All</button>
-      </div>
-    </div>
+					<!-- Empty state -->
+					<div class="empty-state" id="emptyState">
+						<div class="es-icon">🔗</div>
+						<p class="es-title">Add PDF files to begin</p>
+						<p class="es-sub">
+							Add at least 2 PDFs from the left panel,<br/>configure options on the right, then merge.
+						</p>
+					</div>
 
-    <!-- STEP 3: Options + Merge -->
-    <div class="card" id="mergeCard" style="display:none;">
-      <div class="card-label">
-        <span class="step-num">3</span>
-        Options & Merge
-      </div>
+					<!-- Merge order preview (shown after files added) -->
+					<div class="merge-preview" id="mergePreview" style="display:none;">
+						<div class="mp-label">Merge Order Preview</div>
+						<div class="mp-flow" id="mpFlow"></div>
+					</div>
 
-      <div class="options-grid">
-        <div class="option-group">
-          <label class="option-label" for="outputName">Output File Name</label>
-          <div class="input-with-ext">
-            <input type="text" id="outputName" class="text-input" value="merged" placeholder="merged" />
-            <span class="ext">.pdf</span>
-          </div>
-        </div>
-        <div class="option-group">
-          <label class="option-label">Page Order</label>
-          <div class="radio-group">
-            <label class="radio-label">
-              <input type="radio" name="pageOrder" value="normal" checked />
-              <span>Normal (1, 2, 3...)</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="pageOrder" value="reverse" />
-              <span>Reversed per file</span>
-            </label>
-          </div>
-        </div>
-      </div>
+					<!-- Progress (shown during merge) -->
+					<div class="progress-panel" id="progressPanel" style="display:none;">
+						<div class="pp-icon">⚙️</div>
+						<p class="pp-title" id="ppTitle">Merging...</p>
+						<div class="pp-bar-wrap">
+							<div class="pp-bar-fill" id="ppBarFill"></div>
+						</div>
+						<p class="pp-label" id="ppLabel">Processing file 1 of 3...</p>
+					</div>
 
-      <div class="merge-action">
-        <button class="btn btn-merge" id="mergeBtn">
-          <span id="mergeBtnIcon">🔗</span>
-          <span id="mergeBtnText">Merge PDFs</span>
-        </button>
-        <p class="merge-hint" id="mergeHint"></p>
-      </div>
+					<!-- Success (shown after merge) -->
+					<div class="success-panel" id="successPanel" style="display:none;">
+						<div class="sp-icon">✅</div>
+						<p class="sp-title">Merge Complete!</p>
+						<p class="sp-sub" id="spInfo"></p>
+						<div class="sp-actions">
+							<button class="action-btn action-btn-green" id="downloadBtn">💾 Download PDF</button>
+							<button class="action-btn" id="mergeAgainBtn">🔄 Start Over</button>
+						</div>
+					</div>
 
-      <!-- PROGRESS -->
-      <div class="progress-wrap" id="progressWrap" style="display:none;">
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill" id="progressFill"></div>
-        </div>
-        <p class="progress-label" id="progressLabel">Processing...</p>
-      </div>
-    </div>
+				</div>
+			</main>
 
-    <!-- STEP 4: Download -->
-    <div class="card card-success" id="downloadCard" style="display:none;">
-      <div class="success-icon">✅</div>
-      <h2 class="success-title">Merge Complete!</h2>
-      <p class="success-sub" id="successInfo"></p>
-      <div class="download-actions">
-        <button class="btn btn-download" id="downloadBtn">
-          💾 Download Merged PDF
-        </button>
-        <button class="btn btn-outline" id="mergeAgainBtn">
-          🔄 Merge Again
-        </button>
-      </div>
-    </div>
+			<!-- RIGHT: Options Panel -->
+			<aside class="panel panel-options">
+				<div class="panel-header">
+					<span class="panel-title">🎛 Options</span>
+				</div>
+				<div class="panel-body options-body">
 
-  </main>
+					<div class="opt-section">
+						<div class="opt-section-title">Output</div>
+						<div class="opt-row">
+							<label class="opt-label">File name</label>
+							<div class="opt-input-row">
+								<input type="text" id="outputName" class="opt-input" value="merged" />
+								<span class="opt-ext">.pdf</span>
+							</div>
+						</div>
+					</div>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <span>⚡ ToolZone · PDF Merger · 100% Free · No data sent to any server</span>
-  </footer>
+					<div class="opt-section">
+						<div class="opt-section-title">Page Order</div>
+						<div class="opt-radio-group">
+							<label class="opt-radio">
+								<input type="radio" name="pageOrder" value="normal" checked="" />
+								<span>Normal (1, 2, 3…)</span>
+							</label>
+							<label class="opt-radio">
+								<input type="radio" name="pageOrder" value="reverse" />
+								<span>Reversed per file</span>
+							</label>
+						</div>
+					</div>
 
-  <!-- pdf-lib CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-  <script src="script.js"></script>
-</body>
+					<div class="opt-section">
+						<div class="opt-section-title">Page Size</div>
+						<select id="pageSizeOverride" class="opt-select">
+							<option value="none">Keep original sizes</option>
+							<option value="A4">Normalize to A4</option>
+							<option value="Letter">Normalize to Letter</option>
+						</select>
+					</div>
+
+					<div class="opt-section">
+						<div class="opt-section-title">Extras</div>
+						<div class="opt-checks">
+							<label class="opt-check">
+								<input type="checkbox" id="optBlankPage" />
+								<span>Blank page between files</span>
+							</label>
+							<label class="opt-check">
+								<input type="checkbox" id="optOddPad" />
+								<span>Pad odd-page files (duplex)</span>
+							</label>
+							<label class="opt-check">
+								<input type="checkbox" id="optOpenAfter" />
+								<span>Preview after download</span>
+							</label>
+						</div>
+					</div>
+
+					<div class="opt-section">
+						<div class="opt-section-title">Per-File Settings</div>
+						<p class="opt-hint">Select a file in the left panel to set its page range and rotation.</p>
+						<div class="per-file-editor" id="perFileEditor" style="display:none;">
+							<div class="opt-row">
+								<label class="opt-label">Page range</label>
+								<input type="text" id="pfRange" class="opt-input" placeholder="e.g. 1-3, 5" />
+							</div>
+							<p class="opt-hint" style="margin-top:4px">Leave empty = all pages</p>
+							<div class="opt-row" style="margin-top:10px">
+								<label class="opt-label">Rotation</label>
+								<select id="pfRotation" class="opt-select">
+									<option value="0">0° (no rotation)</option>
+									<option value="90">90° clockwise</option>
+									<option value="180">180° flip</option>
+									<option value="270">270° clockwise</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</aside>
+
+		</div>
+
+		<!-- ── STATUS BAR ─────────────────────────────────────────── -->
+		<footer class="statusbar">
+			<span id="statusMsg">Ready — Add PDF files to begin</span>
+			<span class="sb-right">⚡ ToolZone · No upload · No watermark · 100% Free</span>
+		</footer>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+		<script src="script.js"></script>
+	</body>
 </html>
