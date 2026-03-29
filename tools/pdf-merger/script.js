@@ -5,38 +5,55 @@ let mergedPdfBytes = null;
 let dragSrcIndex = null;
 let selectedFileId = null;
 
-// DOM
-const dropZone     = document.getElementById('dropZone');
-const fileInput    = document.getElementById('fileInput');
-const addMoreInput = document.getElementById('addMoreInput');
-const fileListEl   = document.getElementById('fileList');
-const mergeBtn     = document.getElementById('mergeBtn');
-const clearAllBtn  = document.getElementById('clearAllBtn');
-const downloadBtn  = document.getElementById('downloadBtn');
-const mergeAgainBtn= document.getElementById('mergeAgainBtn');
-const outputName   = document.getElementById('outputName');
-const fileCount    = document.getElementById('fileCount');
-const totalInfo    = document.getElementById('totalInfo');
-const mergeStatus  = document.getElementById('mergeStatus');
-const statusMsg    = document.getElementById('statusMsg');
-const emptyState   = document.getElementById('emptyState');
-const mergePreview = document.getElementById('mergePreview');
-const progressPanel= document.getElementById('progressPanel');
-const successPanel = document.getElementById('successPanel');
-const mpFlow       = document.getElementById('mpFlow');
-const ppBarFill    = document.getElementById('ppBarFill');
-const ppTitle      = document.getElementById('ppTitle');
-const ppLabel      = document.getElementById('ppLabel');
-const spInfo       = document.getElementById('spInfo');
-const perFileEditor= document.getElementById('perFileEditor');
-const pfRange      = document.getElementById('pfRange');
-const pfRotation   = document.getElementById('pfRotation');
+const $ = id => document.getElementById(id);
+
+const dropZone    = $('dropZone');
+const fileInput   = $('fileInput');
+const addMoreInput= $('addMoreInput');
+const fileListEl  = $('fileList');
+const mergeBtn    = $('mergeBtn');
+const clearAllBtn = $('clearAllBtn');
+const downloadBtn = $('downloadBtn');
+const mergeAgainBtn=$('mergeAgainBtn');
+const outputName  = $('outputName');
+const fileCount   = $('fileCount');
+const totalInfo   = $('totalInfo');
+const mergeStatus = $('mergeStatus');
+const statusMsg   = $('statusMsg');
+const emptyState  = $('emptyState');
+const mergePreview= $('mergePreview');
+const progressPanel=$('progressPanel');
+const successPanel= $('successPanel');
+const mpFlow      = $('mpFlow');
+const ppBarFill   = $('ppBarFill');
+const ppTitle     = $('ppTitle');
+const ppLabel     = $('ppLabel');
+const spInfo      = $('spInfo');
+const perFileSection=$('perFileSection');
+const perFileName = $('perFileName');
+const pfRange     = $('pfRange');
+const pfRotation  = $('pfRotation');
+
+// ── MOBILE TABS ──────────────────────────────────────────────────
+document.querySelectorAll('.mtab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mtab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('[data-tab-content]').forEach(p => {
+      p.classList.toggle('mobile-active', p.dataset.tabContent === tab);
+    });
+  });
+});
+// Activate first tab on mobile
+if (window.innerWidth <= 900) {
+  document.querySelector('[data-tab-content="files"]').classList.add('mobile-active');
+}
 
 // ── FILE INPUT ───────────────────────────────────────────────────
 fileInput.addEventListener('change',    e => addFiles(e.target.files));
 addMoreInput.addEventListener('change', e => addFiles(e.target.files));
 
-// FIX: prevent double dialog — ignore clicks from label/input elements
 dropZone.addEventListener('click', e => {
   if (e.target.closest('label') || e.target.tagName === 'INPUT') return;
   fileInput.click();
@@ -48,20 +65,17 @@ dropZone.addEventListener('drop', e => {
   addFiles(e.dataTransfer.files);
 });
 
-clearAllBtn.addEventListener('click', clearAll);
-mergeBtn.addEventListener('click', mergePdfs);
-mergeAgainBtn.addEventListener('click', clearAll);
-downloadBtn.addEventListener('click', doDownload);
-
-// Per-file options sync
-pfRange.addEventListener('input',    () => updateSelectedFile());
-pfRotation.addEventListener('change',() => updateSelectedFile());
+clearAllBtn.addEventListener('click',  clearAll);
+mergeBtn.addEventListener('click',     mergePdfs);
+mergeAgainBtn.addEventListener('click',clearAll);
+downloadBtn.addEventListener('click',  doDownload);
+pfRange.addEventListener('input',      syncPerFile);
+pfRotation.addEventListener('change',  syncPerFile);
 
 // ── ADD FILES ────────────────────────────────────────────────────
 async function addFiles(raw) {
   const pdfs = Array.from(raw).filter(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
   if (!pdfs.length) { toast('Please select valid PDF files only.'); return; }
-
   for (const f of pdfs) {
     const pages = await getPageCount(f);
     files.push({ id: uid(), file: f, name: f.name, size: f.size, pages, range: '', rotation: '0' });
@@ -71,72 +85,64 @@ async function addFiles(raw) {
 
 // ── RENDER ───────────────────────────────────────────────────────
 function render() {
-  const hasFiles = files.length > 0;
+  const has = files.length > 0;
 
-  // Toggle drop zone / file list
-  dropZone.style.display  = hasFiles ? 'none' : 'flex';
-  fileListEl.style.display = hasFiles ? 'flex' : 'none';
+  dropZone.style.display   = has ? 'none' : 'flex';
+  fileListEl.style.display = has ? 'flex' : 'none';
 
-  // File count
-  fileCount.textContent = hasFiles ? `${files.length} file${files.length !== 1 ? 's' : ''}` : '0 files';
+  fileCount.textContent   = has ? `${files.length} file${files.length !== 1 ? 's' : ''}` : '0 files';
+  mergeBtn.disabled       = files.length < 2;
+  mergeStatus.textContent = files.length < 2
+    ? (files.length === 1 ? 'Need 1 more PDF' : 'No files added')
+    : `${files.length} files ready`;
 
-  // Total info
   const totalSize  = files.reduce((s, f) => s + f.size, 0);
   const totalPages = files.reduce((s, f) => s + (typeof f.pages === 'number' ? f.pages : 0), 0);
-  totalInfo.textContent = hasFiles ? `${fmtBytes(totalSize)} · ~${totalPages}pp` : '';
+  totalInfo.textContent = has ? `${fmtBytes(totalSize)} · ~${totalPages}pp` : '';
 
-  // Merge button
-  mergeBtn.disabled = files.length < 2;
-  mergeStatus.textContent = files.length < 2
-    ? (files.length === 1 ? 'Add 1 more PDF' : 'No files added')
-    : `${files.length} files ready to merge`;
-
-  // Status bar
-  statusMsg.textContent = hasFiles
-    ? `${files.length} file${files.length !== 1 ? 's' : ''} loaded — Arrange order, set options, then click Merge PDFs`
+  statusMsg.textContent = has
+    ? `${files.length} file(s) loaded — Arrange order then click Merge PDFs`
     : 'Ready — Add PDF files to begin';
 
   // Build file list
   fileListEl.innerHTML = '';
   files.forEach((f, i) => {
-    const item = document.createElement('div');
-    item.className = 'file-item' + (f.id === selectedFileId ? ' selected' : '');
-    item.dataset.index = i;
-    item.draggable = true;
-    item.title = f.name;
+    const el = document.createElement('div');
+    el.className = 'file-item' + (f.id === selectedFileId ? ' selected' : '');
+    el.dataset.index = i;
+    el.draggable = true;
+    el.title = `${f.name} — Click to configure page range and rotation`;
 
-    const rangeBadge = f.range ? `<span class="fi-range-badge">p:${f.range}</span>` : '';
-    const rotBadge   = f.rotation !== '0' ? `<span class="fi-rot-badge">${f.rotation}°</span>` : '';
+    const rb = f.range ? `<span class="fi-badge fi-badge-blue">p:${f.range}</span>` : '';
+    const rotb = f.rotation !== '0' ? `<span class="fi-badge fi-badge-gray">${f.rotation}°</span>` : '';
 
-    item.innerHTML = `
-      <span class="fi-drag">⠿</span>
+    el.innerHTML = `
+      <span class="fi-drag" title="Drag to reorder">⠿</span>
       <span class="fi-num">${i + 1}</span>
       <span class="fi-icon">📄</span>
       <div class="fi-info">
         <div class="fi-name">${esc(f.name)}</div>
-        <div class="fi-meta">${fmtBytes(f.size)} · ${f.pages}pp ${rangeBadge}${rotBadge}</div>
+        <div class="fi-meta">${fmtBytes(f.size)} · ${f.pages}pp ${rb}${rotb}</div>
       </div>
       <div class="fi-actions">
-        <button class="fi-btn" title="Move up"   onclick="move(${i},-1)">↑</button>
-        <button class="fi-btn" title="Move down" onclick="move(${i},+1)">↓</button>
-        <button class="fi-btn del" title="Remove" onclick="remove(${i})">✕</button>
+        <button class="fi-btn" title="Move up in merge order" onclick="move(${i},-1)">↑</button>
+        <button class="fi-btn" title="Move down in merge order" onclick="move(${i},+1)">↓</button>
+        <button class="fi-btn del" title="Remove this file" onclick="remove(${i})">✕</button>
       </div>
     `;
 
-    // Select file to edit per-file options
-    item.addEventListener('click', e => {
+    el.addEventListener('click', e => {
       if (e.target.closest('.fi-btn')) return;
-      selectedFileId = (selectedFileId === f.id) ? null : f.id;
-      renderPerFileEditor();
+      selectedFileId = selectedFileId === f.id ? null : f.id;
+      renderPerFile();
       render();
     });
 
-    // Drag reorder
-    item.addEventListener('dragstart', () => { dragSrcIndex = i; setTimeout(() => item.classList.add('dragging-item'), 0); });
-    item.addEventListener('dragend',   () => { item.classList.remove('dragging-item'); document.querySelectorAll('.file-item').forEach(x => x.classList.remove('drag-over')); });
-    item.addEventListener('dragover',  e => { e.preventDefault(); document.querySelectorAll('.file-item').forEach(x => x.classList.remove('drag-over')); item.classList.add('drag-over'); });
-    item.addEventListener('drop', e => {
-      e.preventDefault(); item.classList.remove('drag-over');
+    el.addEventListener('dragstart', () => { dragSrcIndex = i; setTimeout(() => el.classList.add('dragging-item'), 0); });
+    el.addEventListener('dragend',   () => { el.classList.remove('dragging-item'); document.querySelectorAll('.file-item').forEach(x => x.classList.remove('drag-over')); });
+    el.addEventListener('dragover',  e2 => { e2.preventDefault(); document.querySelectorAll('.file-item').forEach(x => x.classList.remove('drag-over')); el.classList.add('drag-over'); });
+    el.addEventListener('drop', e2 => {
+      e2.preventDefault(); el.classList.remove('drag-over');
       if (dragSrcIndex !== null && dragSrcIndex !== i) {
         const moved = files.splice(dragSrcIndex, 1)[0];
         files.splice(i, 0, moved);
@@ -144,13 +150,11 @@ function render() {
         render(); renderMergePreview();
       }
     });
-
-    fileListEl.appendChild(item);
+    fileListEl.appendChild(el);
   });
 
-  // Center panel
-  showCenter(hasFiles ? 'preview' : 'empty');
-  if (hasFiles) renderMergePreview();
+  showCenter(has ? 'preview' : 'empty');
+  if (has) renderMergePreview();
 }
 
 function renderMergePreview() {
@@ -160,7 +164,7 @@ function renderMergePreview() {
     item.className = 'mp-item';
     const details = [
       f.range ? `Pages: ${f.range}` : `All ${f.pages} pages`,
-      f.rotation !== '0' ? `Rotate ${f.rotation}°` : ''
+      f.rotation !== '0' ? `Rotated ${f.rotation}°` : ''
     ].filter(Boolean).join(' · ');
     item.innerHTML = `
       <span class="mp-num">${i + 1}</span>
@@ -172,48 +176,47 @@ function renderMergePreview() {
     `;
     mpFlow.appendChild(item);
     if (i < files.length - 1) {
-      const arrow = document.createElement('div');
-      arrow.className = 'mp-arrow'; arrow.textContent = '↓';
-      mpFlow.appendChild(arrow);
+      const a = document.createElement('div');
+      a.className = 'mp-arrow'; a.textContent = '↓';
+      mpFlow.appendChild(a);
     }
   });
 }
 
-function renderPerFileEditor() {
+function renderPerFile() {
   const f = files.find(x => x.id === selectedFileId);
-  if (!f) { perFileEditor.style.display = 'none'; return; }
-  perFileEditor.style.display = 'block';
+  perFileSection.style.display = f ? 'block' : 'none';
+  if (!f) return;
+  perFileName.textContent = `Configuring: ${f.name}`;
   pfRange.value    = f.range;
   pfRotation.value = f.rotation;
 }
 
-function updateSelectedFile() {
+function syncPerFile() {
   const f = files.find(x => x.id === selectedFileId);
   if (!f) return;
   f.range    = pfRange.value;
   f.rotation = pfRotation.value;
-  render();
-  renderMergePreview();
+  render(); renderMergePreview();
 }
 
 function showCenter(state) {
-  emptyState.style.display   = state === 'empty'    ? 'block' : 'none';
-  mergePreview.style.display = state === 'preview'  ? 'block' : 'none';
-  progressPanel.style.display= state === 'progress' ? 'block' : 'none';
-  successPanel.style.display = state === 'success'  ? 'block' : 'none';
+  emptyState.style.display    = state === 'empty'    ? 'block' : 'none';
+  mergePreview.style.display  = state === 'preview'  ? 'block' : 'none';
+  progressPanel.style.display = state === 'progress' ? 'block' : 'none';
+  successPanel.style.display  = state === 'success'  ? 'block' : 'none';
 }
 
-// ── MOVE / REMOVE ────────────────────────────────────────────────
-function move(index, dir) {
-  const n = index + dir;
+function move(i, dir) {
+  const n = i + dir;
   if (n < 0 || n >= files.length) return;
-  [files[index], files[n]] = [files[n], files[index]];
+  [files[i], files[n]] = [files[n], files[i]];
   render();
 }
 
-function remove(index) {
-  if (selectedFileId === files[index].id) { selectedFileId = null; perFileEditor.style.display = 'none'; }
-  files.splice(index, 1);
+function remove(i) {
+  if (selectedFileId === files[i].id) { selectedFileId = null; perFileSection.style.display = 'none'; }
+  files.splice(i, 1);
   if (!files.length) { clearAll(); return; }
   render();
 }
@@ -221,7 +224,7 @@ function remove(index) {
 function clearAll() {
   files = []; mergedPdfBytes = null; selectedFileId = null;
   fileInput.value = ''; addMoreInput.value = '';
-  perFileEditor.style.display = 'none';
+  perFileSection.style.display = 'none';
   mergeBtn.disabled = true;
   render();
 }
@@ -242,36 +245,33 @@ function parseRange(str, max) {
 // ── MERGE ────────────────────────────────────────────────────────
 async function mergePdfs() {
   if (files.length < 2) return;
-
   mergeBtn.disabled = true;
   showCenter('progress');
-  ppTitle.textContent = 'Merging files...';
 
   const pageOrder = document.querySelector('input[name="pageOrder"]:checked').value;
-  const addBlank  = document.getElementById('optBlankPage').checked;
-  const padOdd    = document.getElementById('optOddPad').checked;
-  const openAfter = document.getElementById('optOpenAfter').checked;
-  const sizeOvr   = document.getElementById('pageSizeOverride').value;
+  const addBlank  = $('optBlankPage').checked;
+  const padOdd    = $('optOddPad').checked;
+  const openAfter = $('optOpenAfter').checked;
+  const sizeOvr   = $('pageSizeOverride').value;
 
   try {
     const out = await PDFLib.PDFDocument.create();
 
     for (let i = 0; i < files.length; i++) {
-      const f   = files[i];
-      const pct = Math.round(10 + (i / files.length) * 82);
-      ppBarFill.style.width = pct + '%';
+      const f = files[i];
+      ppBarFill.style.width = Math.round(10 + (i / files.length) * 82) + '%';
       ppLabel.textContent   = `Processing ${i + 1} of ${files.length}: ${f.name}`;
 
       const bytes = await readBuf(f.file);
       let src;
       try { src = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true }); }
-      catch { toast(`Skipped "${f.name}" — may be protected or corrupted.`); continue; }
+      catch { toast(`Skipped "${f.name}" — may be password protected.`); continue; }
 
       let indices = parseRange(f.range, src.getPageCount());
       if (pageOrder === 'reverse') indices = [...indices].reverse();
 
       const copied = await out.copyPages(src, indices);
-      const rot = parseInt(f.rotation) || 0;
+      const rot    = parseInt(f.rotation) || 0;
 
       copied.forEach(page => {
         if (rot) page.setRotation(PDFLib.degrees((page.getRotation().angle + rot) % 360));
@@ -281,30 +281,32 @@ async function mergePdfs() {
       });
 
       if (padOdd && out.getPageCount() % 2 !== 0) {
-        const bp = out.addPage();
-        const lp = copied[copied.length - 1];
+        const bp = out.addPage(); const lp = copied[copied.length - 1];
         if (lp) bp.setSize(lp.getWidth(), lp.getHeight());
       }
       if (addBlank && i < files.length - 1) {
-        const bp = out.addPage();
-        const lp = copied[copied.length - 1];
+        const bp = out.addPage(); const lp = copied[copied.length - 1];
         if (lp) bp.setSize(lp.getWidth(), lp.getHeight());
       }
-
       await delay(40);
     }
 
-    ppBarFill.style.width = '98%';
-    ppLabel.textContent   = 'Finalising...';
+    ppBarFill.style.width = '98%'; ppLabel.textContent = 'Finalising...';
     await delay(100);
-
     mergedPdfBytes = await out.save();
     ppBarFill.style.width = '100%';
     await delay(200);
 
-    spInfo.textContent = `${files.length} files merged · ${out.getPageCount()} pages · ${fmtBytes(mergedPdfBytes.byteLength)}`;
-    statusMsg.textContent = `✅ Done — ${out.getPageCount()} pages · ${fmtBytes(mergedPdfBytes.byteLength)} — Ready to download`;
+    spInfo.textContent = `${files.length} files merged · ${out.getPageCount()} total pages · ${fmtBytes(mergedPdfBytes.byteLength)}`;
+    statusMsg.textContent = `✅ Done — ${out.getPageCount()} pages · ${fmtBytes(mergedPdfBytes.byteLength)}`;
     showCenter('success');
+
+    // Switch mobile tab to output
+    if (window.innerWidth <= 900) {
+      document.querySelectorAll('.mtab').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-tab="output"]').classList.add('active');
+      document.querySelectorAll('[data-tab-content]').forEach(p => p.classList.toggle('mobile-active', p.dataset.tabContent === 'output'));
+    }
 
     if (openAfter) window.open(URL.createObjectURL(new Blob([mergedPdfBytes], { type: 'application/pdf' })), '_blank');
 
@@ -319,35 +321,23 @@ async function mergePdfs() {
 function doDownload() {
   if (!mergedPdfBytes) return;
   const name = (outputName.value.trim() || 'merged') + '.pdf';
-  const a = Object.assign(document.createElement('a'), {
+  Object.assign(document.createElement('a'), {
     href: URL.createObjectURL(new Blob([mergedPdfBytes], { type: 'application/pdf' })),
     download: name
-  });
-  a.click();
+  }).click();
 }
 
 // ── UTILS ────────────────────────────────────────────────────────
 async function getPageCount(file) {
-  try {
-    const pdf = await PDFLib.PDFDocument.load(await readBuf(file), { ignoreEncryption: true });
-    return pdf.getPageCount();
-  } catch { return '?'; }
+  try { return (await PDFLib.PDFDocument.load(await readBuf(file), { ignoreEncryption: true })).getPageCount(); }
+  catch { return '?'; }
 }
-
 function readBuf(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = e => res(e.target.result); r.onerror = rej;
-    r.readAsArrayBuffer(file);
-  });
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsArrayBuffer(file); });
 }
-
 function fmtBytes(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-  return (b / 1048576).toFixed(2) + ' MB';
+  if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(2) + ' MB';
 }
-
 function uid()    { return Math.random().toString(36).slice(2); }
 function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function delay(ms){ return new Promise(r => setTimeout(r, ms)); }
@@ -357,14 +347,11 @@ function toast(msg) {
   let t = document.getElementById('tz-toast');
   if (!t) {
     t = document.createElement('div'); t.id = 'tz-toast';
-    t.style.cssText = "position:fixed;bottom:34px;left:50%;transform:translateX(-50%) translateY(60px);background:#1e1e1e;border:1px solid #e05c5c;color:#e0e0e0;padding:9px 20px;border-radius:4px;font-size:12px;font-weight:500;z-index:999;transition:transform 0.25s ease;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.6);font-family:'Inter',sans-serif;";
+    t.style.cssText = "position:fixed;bottom:34px;left:50%;transform:translateX(-50%) translateY(60px);background:#1e1e1e;border:1px solid #e05c5c;color:#e0e0e0;padding:9px 20px;border-radius:4px;font-size:12px;font-weight:500;z-index:999;transition:transform 0.25s ease;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.6);font-family:'Inter',sans-serif;max-width:90vw;text-align:center;";
     document.body.appendChild(t);
   }
-  t.textContent = msg;
-  t.style.transform = 'translateX(-50%) translateY(0)';
-  clearTimeout(toastT);
-  toastT = setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(60px)'; }, 3500);
+  t.textContent = msg; t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastT); toastT = setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(60px)'; }, 3500);
 }
 
-// Init
 render();
