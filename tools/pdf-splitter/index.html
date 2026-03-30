@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PDF Splitter — ToolZone</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+
+		<!-- TOPBAR -->
+		<header class="topbar">
+			<div class="topbar-left">
+				<a href="../../index.html" class="topbar-back" title="Back to all tools">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+						<polyline points="15 18 9 12 15 6"/>
+					</svg>
+				</a>
+				<div class="topbar-divider"></div>
+				<span class="topbar-logo">⚡ ToolZone</span>
+				<div class="topbar-divider"></div>
+				<span class="topbar-tool-name">PDF Splitter</span>
+			</div>
+			<div class="topbar-right">
+				<span class="topbar-badge">🔒 100% Private</span>
+				<button class="tb-btn" id="clearBtn" title="Remove file and start over">🗑 Clear</button>
+				<button class="tb-btn tb-btn-primary" id="splitBtn" disabled="" title="Split the PDF based on your settings">✂️ Split PDF</button>
+			</div>
+		</header>
+
+		<!-- MOBILE TABS -->
+		<div class="mobile-tabs">
+			<button class="mtab active" data-tab="upload">📄 File</button>
+			<button class="mtab" data-tab="options">🎛 Options</button>
+			<button class="mtab" data-tab="output">📦 Output</button>
+		</div>
+
+		<div class="app-layout">
+
+			<!-- LEFT: Upload -->
+			<aside class="panel" data-tab-content="upload">
+				<div class="panel-header">
+					<span class="panel-title">📄 Source PDF</span>
+					<span class="panel-count" id="fileInfo">No file loaded</span>
+				</div>
+				<div class="panel-body">
+					<div class="drop-zone" id="dropZone">
+						<div class="dz-inner">
+							<div class="dz-icon">📄</div>
+							<p class="dz-title">Drop your PDF here</p>
+							<p class="dz-sub">or click to browse from your device</p>
+							<label class="dz-btn" for="fileInput">Choose PDF File</label>
+							<input type="file" id="fileInput" accept=".pdf,application/pdf" hidden="" />
+							<p class="dz-hint">Only one PDF at a time · No file size limit</p>
+						</div>
+					</div>
+
+					<!-- File loaded state -->
+					<div class="file-loaded" id="fileLoaded" style="display:none;">
+						<div class="fl-card">
+							<span class="fl-icon">📄</span>
+							<div class="fl-info">
+								<div class="fl-name" id="flName"></div>
+								<div class="fl-meta" id="flMeta"></div>
+							</div>
+							<button class="fl-remove" id="removeFile" title="Remove this file">✕</button>
+						</div>
+
+						<!-- Page grid preview -->
+						<div class="page-grid-header">
+							<span class="page-grid-title">Pages in this PDF</span>
+							<span class="page-grid-hint">Click pages to select/deselect them</span>
+						</div>
+						<div class="page-grid" id="pageGrid"></div>
+					</div>
+				</div>
+			</aside>
+
+			<!-- CENTER: Visual Preview -->
+			<main class="panel panel-center" data-tab-content="output">
+				<div class="panel-header">
+					<span class="panel-title">📦 Split Preview</span>
+					<span class="panel-count" id="splitPreviewCount">Nothing to preview</span>
+				</div>
+				<div class="panel-body center-body">
+					<div class="empty-state" id="emptyState">
+						<div class="es-icon">✂️</div>
+						<p class="es-title">Upload a PDF to begin</p>
+						<p class="es-sub">
+							Load a PDF, choose how to split it,<br/>then click Split PDF to generate your files.
+						</p>
+					</div>
+
+					<div class="split-result" id="splitResult" style="display:none;">
+						<div class="sr-label">Your split output files will appear here after splitting</div>
+						<div class="sr-list" id="srList"></div>
+						<div class="sr-actions" id="srActions" style="display:none;">
+							<button class="action-btn action-btn-green" id="downloadAllBtn">📦 Download All as ZIP</button>
+						</div>
+					</div>
+
+					<div class="progress-panel" id="progressPanel" style="display:none;">
+						<div class="pp-spinner">✂️</div>
+						<p class="pp-title">Splitting PDF...</p>
+						<div class="pp-bar-wrap">
+							<div class="pp-bar-fill" id="ppBarFill"></div>
+						</div>
+						<p class="pp-label" id="ppLabel">Processing...</p>
+					</div>
+				</div>
+			</main>
+
+			<!-- RIGHT: Options -->
+			<aside class="panel panel-options" data-tab-content="options">
+				<div class="panel-header">
+					<span class="panel-title">🎛 Split Options</span>
+				</div>
+				<div class="panel-body options-body">
+
+					<div class="opt-section">
+						<div class="opt-section-title">Split Method</div>
+						<div class="method-cards">
+
+							<label class="method-card">
+								<input type="radio" name="splitMethod" value="every" checked="" />
+								<div class="mc-body">
+									<div class="mc-icon">📄</div>
+									<div class="mc-title">Extract Every Page</div>
+									<div class="mc-desc">Splits the PDF into individual single-page files. A 10-page PDF becomes 10 separate PDFs.</div>
+								</div>
+							</label>
+
+							<label class="method-card">
+								<input type="radio" name="splitMethod" value="range" />
+								<div class="mc-body">
+									<div class="mc-icon">📑</div>
+									<div class="mc-title">Custom Page Ranges</div>
+									<div class="mc-desc">You define exactly which pages go into each output file. Example: 1-3 becomes file 1, 4-7 becomes file 2.</div>
+								</div>
+							</label>
+
+							<label class="method-card">
+								<input type="radio" name="splitMethod" value="every_n" />
+								<div class="mc-body">
+									<div class="mc-icon">📃</div>
+									<div class="mc-title">Every N Pages</div>
+									<div class="mc-desc">Splits into chunks of equal size. A 12-page PDF split every 3 pages gives 4 files of 3 pages each.</div>
+								</div>
+							</label>
+
+							<label class="method-card">
+								<input type="radio" name="splitMethod" value="selected" />
+								<div class="mc-body">
+									<div class="mc-icon">🖱️</div>
+									<div class="mc-title">Selected Pages Only</div>
+									<div class="mc-desc">Click pages in the File panel to select them, then extract only those pages into a single PDF.</div>
+								</div>
+							</label>
+
+						</div>
+					</div>
+
+					<!-- Range inputs (shown conditionally) -->
+					<div class="opt-section" id="rangeSection" style="display:none;">
+						<div class="opt-section-title">Page Ranges</div>
+						<textarea id="rangeInput" class="range-textarea" placeholder="Enter one range per line:&#10;1-3&#10;4-7&#10;8-10&#10;&#10;Each line = one output PDF file"></textarea>
+						<p class="opt-hint">
+							Enter one page range per line. Each line creates a separate output PDF. Example: typing <code>1-5</code> on line 1 and <code>6-10</code> on line 2 creates 2 PDFs.
+						</p>
+					</div>
+
+					<div class="opt-section" id="everyNSection" style="display:none;">
+						<div class="opt-section-title">Pages Per File</div>
+						<div class="n-input-row">
+							<input type="number" id="nInput" class="n-input" value="2" min="1" max="999" />
+							<span class="n-label">pages per output file</span>
+						</div>
+						<p class="opt-hint">The PDF will be split into equal chunks of this size. The last chunk may have fewer pages if the total doesn't divide evenly.</p>
+					</div>
+
+					<div class="opt-section">
+						<div class="opt-section-title">Output File Names</div>
+						<div class="opt-row">
+							<label class="opt-label">Prefix</label>
+							<input type="text" id="namePrefix" class="opt-input-full" value="split" placeholder="e.g. chapter, part, section" />
+						</div>
+						<p class="opt-hint">
+							Files will be named like: <span id="namePreview" class="name-preview">split_1.pdf, split_2.pdf...</span>
+						</p>
+					</div>
+
+					<div class="opt-section" id="selectedSection" style="display:none;">
+						<div class="opt-section-title">Selected Pages</div>
+						<p class="opt-hint">Go to the File panel and click on page thumbnails to select which pages to extract. Selected pages will be highlighted in red.</p>
+						<div class="selected-count" id="selectedCount">0 pages selected</div>
+					</div>
+
+				</div>
+			</aside>
+		</div>
+
+		<footer class="statusbar">
+			<span id="statusMsg">Ready — Upload a PDF to begin</span>
+			<span class="sb-right">No upload to server · No watermark · 100% Free</span>
+		</footer>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+		<script src="script.js"></script>
+	</body>
+</html>
