@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+		<title>GST Calculator – ToolZone</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+		<link rel="stylesheet" href="style.css"/>
+	</head>
+	<body>
+
+		<!-- HEADER -->
+		<header>
+			<div class="header-inner">
+				<a href="../../index.html" class="logo">
+					<div class="logo-icon">
+						<svg viewBox="0 0 24 24">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+							<polyline points="14 2 14 8 20 8"/>
+							<line x1="16" y1="13" x2="8" y2="13"/>
+							<line x1="16" y1="17" x2="8" y2="17"/>
+						</svg>
+					</div>
+					<span class="logo-text">
+						Tool<span>Zone</span>
+					</span>
+				</a>
+				<nav>
+					<a href="../../index.html">← All Tools</a>
+				</nav>
+			</div>
+		</header>
+
+		<!-- BREADCRUMB -->
+		<div class="breadcrumb">
+			<div class="breadcrumb-inner">
+				<a href="../../index.html">Home</a>
+				<span class="bc-sep">›</span>
+				<a href="../../index.html">Calculators</a>
+				<span class="bc-sep">›</span>
+				<span>GST Calculator</span>
+			</div>
+		</div>
+
+		<!-- TOOL HERO -->
+		<section class="tool-hero">
+			<div class="tool-hero-inner">
+				<div class="tool-hero-left">
+					<div class="tool-badge">Calculator Tools · India</div>
+					<h1>GST Calculator</h1>
+					<p>6 powerful GST modes for India. Add or remove GST, get CGST/SGST splits, compare all slabs, calculate multi-item bills and invoice totals — all real time.</p>
+					<div class="tool-meta">
+						<div class="meta-item">
+							<svg viewBox="0 0 24 24">
+								<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+							</svg>
+							Real-time results
+						</div>
+						<div class="meta-item">
+							<svg viewBox="0 0 24 24">
+								<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+							</svg>
+							India GST Slabs
+						</div>
+						<div class="meta-item">
+							<svg viewBox="0 0 24 24">
+								<rect x="2" y="3" width="20" height="14" rx="2"/>
+								<line x1="8" y1="21" x2="16" y2="21"/>
+								<line x1="12" y1="17" x2="12" y2="21"/>
+							</svg>
+							CGST / SGST Split
+						</div>
+					</div>
+				</div>
+				<div class="tool-hero-icon">🧾</div>
+			</div>
+		</section>
+
+		<!-- MODE TABS -->
+		<div class="mode-tabs-wrap">
+			<div class="mode-tabs">
+				<button class="mode-tab active" data-mode="0">Add GST</button>
+				<button class="mode-tab" data-mode="1">Remove GST</button>
+				<button class="mode-tab" data-mode="2">CGST / SGST</button>
+				<button class="mode-tab" data-mode="3">Compare Slabs</button>
+				<button class="mode-tab" data-mode="4">Multi-Item Bill</button>
+				<button class="mode-tab" data-mode="5">Invoice Calculator</button>
+			</div>
+		</div>
+
+		<!-- MAIN CALCULATOR -->
+		<main class="calc-main">
+
+			<!-- MODE 0: Add GST -->
+			<div class="calc-panel active" id="panel-0">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								Add <em>GST</em> to Price
+							</h2>
+							<p>Calculate GST amount and total payable on a base price</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Base Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m0-price" placeholder="e.g. 10000" inputmode="decimal"/>
+								</div>
+							</div>
+						</div>
+						<div class="slab-group">
+							<label class="slab-label">GST Slab</label>
+							<div class="slab-btns" id="m0-slab">
+								<button class="slab-btn" data-val="0.1">0.1%</button>
+								<button class="slab-btn" data-val="0.25">0.25%</button>
+								<button class="slab-btn" data-val="1">1%</button>
+								<button class="slab-btn" data-val="1.5">1.5%</button>
+								<button class="slab-btn" data-val="3">3%</button>
+								<button class="slab-btn active" data-val="5">5%</button>
+								<button class="slab-btn" data-val="7.5">7.5%</button>
+								<button class="slab-btn" data-val="12">12%</button>
+								<button class="slab-btn" data-val="18">18%</button>
+								<button class="slab-btn" data-val="28">28%</button>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(0)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-0">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🧾</div>
+							<p>Enter price to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">GST Amount</div>
+									<div class="result-value accent" id="r0-gst"></div>
+								</div>
+								<div>
+									<div class="result-label">Total Payable</div>
+									<div class="result-value green" id="r0-total"></div>
+								</div>
+							</div>
+							<div class="breakdown-box" id="r0-breakdown"></div>
+							<div class="result-eq" id="r0-eq"></div>
+							<button class="copy-btn" onclick="copyResult('r0-total', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Total
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 1: Remove GST -->
+			<div class="calc-panel" id="panel-1">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								Remove <em>GST</em> from Price
+							</h2>
+							<p>Find the base price and GST amount from a GST-inclusive total</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>GST-Inclusive Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m1-price" placeholder="e.g. 11800" inputmode="decimal"/>
+								</div>
+							</div>
+						</div>
+						<div class="slab-group">
+							<label class="slab-label">GST Slab</label>
+							<div class="slab-btns" id="m1-slab">
+								<button class="slab-btn" data-val="0.1">0.1%</button>
+								<button class="slab-btn" data-val="0.25">0.25%</button>
+								<button class="slab-btn" data-val="1">1%</button>
+								<button class="slab-btn" data-val="1.5">1.5%</button>
+								<button class="slab-btn" data-val="3">3%</button>
+								<button class="slab-btn active" data-val="5">5%</button>
+								<button class="slab-btn" data-val="7.5">7.5%</button>
+								<button class="slab-btn" data-val="12">12%</button>
+								<button class="slab-btn" data-val="18">18%</button>
+								<button class="slab-btn" data-val="28">28%</button>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(1)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-1">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🧾</div>
+							<p>Enter price to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Base Price</div>
+									<div class="result-value green" id="r1-base"></div>
+								</div>
+								<div>
+									<div class="result-label">GST Amount</div>
+									<div class="result-value accent" id="r1-gst"></div>
+								</div>
+							</div>
+							<div class="breakdown-box" id="r1-breakdown"></div>
+							<div class="result-eq" id="r1-eq"></div>
+							<button class="copy-btn" onclick="copyResult('r1-base', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Base Price
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 2: CGST / SGST Split -->
+			<div class="calc-panel" id="panel-2">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								<em>CGST / SGST</em> Split
+							</h2>
+							<p>Get intra-state and inter-state (IGST) tax breakdown for any amount</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Base Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m2-price" placeholder="e.g. 5000" inputmode="decimal"/>
+								</div>
+							</div>
+						</div>
+						<div class="slab-group">
+							<label class="slab-label">GST Slab</label>
+							<div class="slab-btns" id="m2-slab">
+								<button class="slab-btn" data-val="0.1">0.1%</button>
+								<button class="slab-btn" data-val="0.25">0.25%</button>
+								<button class="slab-btn" data-val="1">1%</button>
+								<button class="slab-btn" data-val="1.5">1.5%</button>
+								<button class="slab-btn" data-val="3">3%</button>
+								<button class="slab-btn active" data-val="5">5%</button>
+								<button class="slab-btn" data-val="7.5">7.5%</button>
+								<button class="slab-btn" data-val="12">12%</button>
+								<button class="slab-btn" data-val="18">18%</button>
+								<button class="slab-btn" data-val="28">28%</button>
+							</div>
+						</div>
+						<div class="toggle-group">
+							<label class="toggle-label">Transaction Type</label>
+							<div class="toggle-btns">
+								<button class="toggle-btn active" id="m2-intra" onclick="setTxType('intra')">Intra-State (CGST+SGST)</button>
+								<button class="toggle-btn" id="m2-inter" onclick="setTxType('inter')">Inter-State (IGST)</button>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(2)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-2">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🧾</div>
+							<p>Enter price to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Total GST</div>
+									<div class="result-value accent" id="r2-gst"></div>
+								</div>
+								<div>
+									<div class="result-label">Total Payable</div>
+									<div class="result-value green" id="r2-total"></div>
+								</div>
+							</div>
+							<div class="split-box" id="r2-split"></div>
+							<div class="result-eq" id="r2-eq"></div>
+							<button class="copy-btn" onclick="copyResult('r2-total', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Total
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 3: Compare Slabs -->
+			<div class="calc-panel" id="panel-3">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								Compare <em>All GST Slabs</em>
+							</h2>
+							<p>See how much GST you pay across all Indian tax slabs for any price</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Base Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m3-price" placeholder="e.g. 10000" inputmode="decimal"/>
+								</div>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(3)">Clear</button>
+					</div>
+
+					<div class="result-card wide" id="result-3">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🧾</div>
+							<p>Enter a price to compare all slabs</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-label" style="margin-bottom:14px">GST Comparison — All Slabs</div>
+							<div class="slab-table" id="r3-table"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 4: Multi-Item Bill -->
+			<div class="calc-panel" id="panel-4">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								<em>Multi-Item</em> GST Bill
+							</h2>
+							<p>Add up to 5 items with different prices and GST slabs</p>
+						</div>
+
+						<div class="item-rows" id="item-rows">
+							<div class="item-row">
+								<div class="item-num">1</div>
+								<div class="item-fields">
+									<div class="input-wrap">
+										<span class="input-prefix">₹</span>
+										<input type="number" class="item-price" placeholder="Price" inputmode="decimal"/>
+									</div>
+									<select class="item-slab">
+										<option value="0">0%</option>
+										<option value="0.1">0.1%</option>
+										<option value="0.25">0.25%</option>
+										<option value="1">1%</option>
+										<option value="1.5">1.5%</option>
+										<option value="3">3%</option>
+										<option value="5" selected="">5%</option>
+										<option value="7.5">7.5%</option>
+										<option value="12">12%</option>
+										<option value="18">18%</option>
+										<option value="28">28%</option>
+									</select>
+								</div>
+							</div>
+							<div class="item-row">
+								<div class="item-num">2</div>
+								<div class="item-fields">
+									<div class="input-wrap">
+										<span class="input-prefix">₹</span>
+										<input type="number" class="item-price" placeholder="Price" inputmode="decimal"/>
+									</div>
+									<select class="item-slab">
+										<option value="0">0%</option>
+										<option value="0.1">0.1%</option>
+										<option value="0.25">0.25%</option>
+										<option value="1">1%</option>
+										<option value="1.5">1.5%</option>
+										<option value="3">3%</option>
+										<option value="5">5%</option>
+										<option value="7.5">7.5%</option>
+										<option value="12" selected="">12%</option>
+										<option value="18">18%</option>
+										<option value="28">28%</option>
+									</select>
+								</div>
+							</div>
+							<div class="item-row">
+								<div class="item-num">3</div>
+								<div class="item-fields">
+									<div class="input-wrap">
+										<span class="input-prefix">₹</span>
+										<input type="number" class="item-price" placeholder="Price" inputmode="decimal"/>
+									</div>
+									<select class="item-slab">
+										<option value="0">0%</option>
+										<option value="0.1">0.1%</option>
+										<option value="0.25">0.25%</option>
+										<option value="1">1%</option>
+										<option value="1.5">1.5%</option>
+										<option value="3">3%</option>
+										<option value="5">5%</option>
+										<option value="7.5">7.5%</option>
+										<option value="12">12%</option>
+										<option value="18" selected="">18%</option>
+										<option value="28">28%</option>
+									</select>
+								</div>
+							</div>
+							<div class="item-row">
+								<div class="item-num">4</div>
+								<div class="item-fields">
+									<div class="input-wrap">
+										<span class="input-prefix">₹</span>
+										<input type="number" class="item-price" placeholder="Price" inputmode="decimal"/>
+									</div>
+									<select class="item-slab">
+										<option value="0">0%</option>
+										<option value="0.1">0.1%</option>
+										<option value="0.25">0.25%</option>
+										<option value="1">1%</option>
+										<option value="1.5">1.5%</option>
+										<option value="3">3%</option>
+										<option value="5">5%</option>
+										<option value="7.5">7.5%</option>
+										<option value="12">12%</option>
+										<option value="18">18%</option>
+										<option value="28" selected="">28%</option>
+									</select>
+								</div>
+							</div>
+							<div class="item-row">
+								<div class="item-num">5</div>
+								<div class="item-fields">
+									<div class="input-wrap">
+										<span class="input-prefix">₹</span>
+										<input type="number" class="item-price" placeholder="Price" inputmode="decimal"/>
+									</div>
+									<select class="item-slab">
+										<option value="0">0%</option>
+										<option value="0.1">0.1%</option>
+										<option value="0.25">0.25%</option>
+										<option value="1">1%</option>
+										<option value="1.5">1.5%</option>
+										<option value="3">3%</option>
+										<option value="5" selected="">5%</option>
+										<option value="7.5">7.5%</option>
+										<option value="12">12%</option>
+										<option value="18">18%</option>
+										<option value="28">28%</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(4)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-4">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🧾</div>
+							<p>Enter at least one item price</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Total GST</div>
+									<div class="result-value accent" id="r4-gst"></div>
+								</div>
+								<div>
+									<div class="result-label">Grand Total</div>
+									<div class="result-value green" id="r4-total"></div>
+								</div>
+							</div>
+							<div class="result-eq" id="r4-eq"></div>
+							<div class="multi-table" id="r4-table"></div>
+							<button class="copy-btn" onclick="copyResult('r4-total', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Grand Total
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 5: Invoice Calculator -->
+			<div class="calc-panel" id="panel-5">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								<em>Invoice</em> Calculator
+							</h2>
+							<p>Calculate invoice total with quantity, unit price and GST slab</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Unit Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m5-price" placeholder="e.g. 500" inputmode="decimal"/>
+								</div>
+							</div>
+							<div class="field-connector">×</div>
+							<div class="field">
+								<label>Quantity</label>
+								<div class="input-wrap">
+									<input type="number" id="m5-qty" placeholder="e.g. 10" inputmode="decimal"/>
+									<span class="input-unit">qty</span>
+								</div>
+							</div>
+						</div>
+						<div class="slab-group">
+							<label class="slab-label">GST Slab</label>
+							<div class="slab-btns" id="m5-slab">
+								<button class="slab-btn" data-val="0.1">0.1%</button>
+								<button class="slab-btn" data-val="0.25">0.25%</button>
+								<button class="slab-btn" data-val="1">1%</button>
+								<button class="slab-btn" data-val="1.5">1.5%</button>
+								<button class="slab-btn" data-val="3">3%</button>
+								<button class="slab-btn" data-val="5">5%</button>
+								<button class="slab-btn" data-val="7.5">7.5%</button>
+								<button class="slab-btn" data-val="12">12%</button>
+								<button class="slab-btn active" data-val="18">18%</button>
+								<button class="slab-btn" data-val="28">28%</button>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(5)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-5">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🧾</div>
+							<p>Enter details to generate invoice</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Invoice Total</div>
+									<div class="result-value green" id="r5-total"></div>
+								</div>
+								<div>
+									<div class="result-label">Total GST</div>
+									<div class="result-value accent" id="r5-gst"></div>
+								</div>
+							</div>
+							<div class="invoice-box" id="r5-invoice"></div>
+							<button class="copy-btn" onclick="copyResult('r5-total', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Invoice Total
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</main>
+
+		<!-- FOOTER -->
+		<footer>
+			<div class="footer-inner">
+				<div class="footer-top">
+					<div class="footer-brand">
+						<div class="footer-logo">
+							Tool<span>Zone</span>
+						</div>
+						<p>Free online tools for everyone. Built with ❤️ in India.</p>
+					</div>
+					<div class="footer-links">
+						<a href="#">About</a>
+						<a href="#">Privacy</a>
+						<a href="#">Contact</a>
+					</div>
+				</div>
+				<div class="footer-bottom">
+					<p>© 2025 ToolZone. All tools are free, forever.</p>
+				</div>
+			</div>
+		</footer>
+
+		<script src="script.js"></script>
+	</body>
+</html>

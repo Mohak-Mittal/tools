@@ -1,378 +1,343 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ToolZone — Free Tools For Everyone</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Satoshi:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <!-- Fallback fonts if Clash Display not available -->
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>ToolZone – Free Online Tools</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+		<link rel="stylesheet" href="style.css"/>
+	</head>
+	<body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="nav-inner">
-      <a class="logo" href="index.html">
-        <span class="logo-icon">⚡</span>
-        <span class="logo-text">ToolZone</span>
-      </a>
-      <div class="nav-right">
-        <span class="nav-badge">100% Free</span>
-        <div class="search-wrap">
-          <input type="text" id="searchInput" class="search-input" placeholder="Search tools..." autocomplete="off" />
-          <span class="search-icon">🔍</span>
-        </div>
-      </div>
-    </div>
-  </nav>
+		<!-- HEADER -->
+		<header>
+			<div class="header-inner">
+				<a href="index.html" class="logo">
+					<div class="logo-icon">
+						<svg viewBox="0 0 24 24">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+							<polyline points="14 2 14 8 20 8"/>
+							<line x1="16" y1="13" x2="8" y2="13"/>
+							<line x1="16" y1="17" x2="8" y2="17"/>
+						</svg>
+					</div>
+					<span class="logo-text">
+						Tool<span>Zone</span>
+					</span>
+				</a>
+				<nav>
+					<a href="#">Tools</a>
+					<a href="#">Categories</a>
+					<a href="#">About</a>
+				</nav>
+				<div class="header-badge">100% Free</div>
+			</div>
+		</header>
 
-  <!-- PAGE HEADER (small, not big) -->
-  <div class="page-header">
-    <p class="page-tagline">Tools other sites charge for — <strong>completely free.</strong></p>
-    <div class="tool-count-row">
-      <span class="pill">📄 PDF</span>
-      <span class="pill">🖼️ Image</span>
-      <span class="pill">✍️ Writing</span>
-      <span class="pill">📋 Business</span>
-      <span class="pill">🌍 Everyday</span>
-      <span class="pill">💻 Developer</span>
-    </div>
-  </div>
+		<!-- HERO -->
+		<section class="hero">
+			<div class="hero-inner">
+				<div class="hero-badge">✦ No Login · No Ads · No Nonsense</div>
+				<h1>
+					Every Tool You'll<br/><span class="gradient-text">Ever Need</span>
+				</h1>
+				<p>Hundreds of free online tools for calculations, conversions, images, text, finance and more. All in one place, instant and free.</p>
 
-  <!-- MAIN CONTENT -->
-  <main class="main">
+				<div class="search-wrap">
+					<svg viewBox="0 0 24 24">
+						<circle cx="11" cy="11" r="8"/>
+						<line x1="21" y1="21" x2="16.65" y2="16.65"/>
+					</svg>
+					<input type="text" id="searchInput" placeholder="Search any tool..."/>
+					<kbd>⌘K</kbd>
+				</div>
 
-    <!-- SEARCH RESULTS (hidden by default) -->
-    <div id="searchResults" class="search-results" style="display:none;">
-      <div class="section-title">Search Results</div>
-      <div id="searchGrid" class="tools-flat-grid"></div>
-    </div>
+				<div class="stats-row">
+					<div class="stat">
+						<span id="toolCount">15</span> Tools
+					</div>
+					<div class="stat-divider"></div>
+					<div class="stat">
+						<span>1</span> Category
+					</div>
+					<div class="stat-divider"></div>
+					<div class="stat">
+						<span>∞</span> Free Forever
+					</div>
+				</div>
+			</div>
+		</section>
 
-    <!-- CATEGORY SECTIONS -->
-    <div id="categorySections">
+		<!-- CATEGORIES NAV -->
+		<div class="cat-nav">
+			<div class="cat-nav-inner">
+				<button class="cat-btn active" data-cat="all">All Tools</button>
+				<button class="cat-btn" data-cat="calculators">🧮 Calculators</button>
+				<!-- Add more category buttons here as you expand -->
+			</div>
+		</div>
 
-      <!-- PDF Tools -->
-      <section class="category-section" id="cat-pdf">
-        <div class="section-head">
-          <div class="section-head-left">
-            <span class="section-icon" style="background: rgba(252,92,125,0.12); color:#fc5c7d;">📄</span>
-            <div>
-              <h2 class="section-title">PDF Tools</h2>
-              <p class="section-sub">Merge, split, compress — no watermarks, no limits</p>
-            </div>
-          </div>
-          <span class="section-count" style="color:#fc5c7d;">6 tools</span>
-        </div>
-        <div class="tools-grid">
-          <a class="tool-card" href="tools/pdf-merger/index.html" style="--accent:#fc5c7d">
-            <span class="tool-icon">🔗</span>
-            <div class="tool-info">
-              <h3>PDF Merger</h3>
-              <p>Combine multiple PDFs into one</p>
-            </div>
-            <span class="tool-tag hot">Popular</span>
-          </a>
-          <a class="tool-card" href="tools/pdf-splitter/index.html" style="--accent:#fc5c7d">
-            <span class="tool-icon">✂️</span>
-            <div class="tool-info">
-              <h3>PDF Splitter</h3>
-              <p>Extract specific pages from a PDF</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/pdf-compressor/index.html" style="--accent:#fc5c7d">
-            <span class="tool-icon">🗜️</span>
-            <div class="tool-info">
-              <h3>PDF Compressor</h3>
-              <p>Reduce PDF size without quality loss</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/image-to-pdf/index.html" style="--accent:#fc5c7d">
-            <span class="tool-icon">🖼️</span>
-            <div class="tool-info">
-              <h3>Image to PDF</h3>
-              <p>Convert JPG/PNG into a PDF file</p>
-            </div>
-            <span class="tool-tag">Free</span>
-          </a>
-          <a class="tool-card" href="tools/pdf-to-text/index.html" style="--accent:#fc5c7d">
-            <span class="tool-icon">📝</span>
-            <div class="tool-info">
-              <h3>PDF to Text</h3>
-              <p>Extract all readable text from a PDF</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/pdf-password/index.html" style="--accent:#fc5c7d">
-            <span class="tool-icon">🔐</span>
-            <div class="tool-info">
-              <h3>PDF Password</h3>
-              <p>Protect PDF with a password</p>
-            </div>
-          </a>
-        </div>
-      </section>
+		<!-- TOOLS SECTION -->
+		<main class="tools-main">
 
-      <!-- Image Tools -->
-      <section class="category-section" id="cat-image">
-        <div class="section-head">
-          <div class="section-head-left">
-            <span class="section-icon" style="background:rgba(124,92,252,0.12);color:#7c5cfc;">🖼️</span>
-            <div>
-              <h2 class="section-title">Image Tools</h2>
-              <p class="section-sub">Compress, resize, watermark — all in your browser</p>
-            </div>
-          </div>
-          <span class="section-count" style="color:#7c5cfc;">5 tools</span>
-        </div>
-        <div class="tools-grid">
-          <a class="tool-card" href="tools/image-compressor/index.html" style="--accent:#7c5cfc">
-            <span class="tool-icon">🗜️</span>
-            <div class="tool-info">
-              <h3>Image Compressor</h3>
-              <p>Reduce image size, keep quality</p>
-            </div>
-            <span class="tool-tag hot">Popular</span>
-          </a>
-          <a class="tool-card" href="tools/image-resizer/index.html" style="--accent:#7c5cfc">
-            <span class="tool-icon">📐</span>
-            <div class="tool-info">
-              <h3>Image Resizer</h3>
-              <p>Resize to exact pixels or percentage</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/image-converter/index.html" style="--accent:#7c5cfc">
-            <span class="tool-icon">🔄</span>
-            <div class="tool-info">
-              <h3>Format Converter</h3>
-              <p>Convert between JPG, PNG, WebP</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/image-watermark/index.html" style="--accent:#7c5cfc">
-            <span class="tool-icon">💧</span>
-            <div class="tool-info">
-              <h3>Add Watermark</h3>
-              <p>Add text watermark to any image</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/image-to-base64/index.html" style="--accent:#7c5cfc">
-            <span class="tool-icon">🔤</span>
-            <div class="tool-info">
-              <h3>Image to Base64</h3>
-              <p>Convert image to base64 string</p>
-            </div>
-          </a>
-        </div>
-      </section>
+			<!-- CALCULATORS -->
+			<section class="category-section" id="cat-calculators">
+				<div class="category-header">
+					<div class="category-icon" style="--cat-color: #2563EB; --cat-bg: #EFF6FF;">🧮</div>
+					<div>
+						<h2 class="category-title">Calculator Tools</h2>
+						<p class="category-subtitle">Finance, health, and everyday calculations</p>
+					</div>
+					<span class="category-count">15 tools</span>
+				</div>
 
-      <!-- Writing Tools -->
-      <section class="category-section" id="cat-writing">
-        <div class="section-head">
-          <div class="section-head-left">
-            <span class="section-icon" style="background:rgba(92,248,200,0.12);color:#5cf8c8;">✍️</span>
-            <div>
-              <h2 class="section-title">Writing Tools</h2>
-              <p class="section-sub">Text utilities for students, writers and creators</p>
-            </div>
-          </div>
-          <span class="section-count" style="color:#5cf8c8;">5 tools</span>
-        </div>
-        <div class="tools-grid">
-          <a class="tool-card" href="tools/word-counter/index.html" style="--accent:#5cf8c8">
-            <span class="tool-icon">🔢</span>
-            <div class="tool-info">
-              <h3>Word Counter</h3>
-              <p>Words, chars, sentences, paragraphs</p>
-            </div>
-            <span class="tool-tag hot">Popular</span>
-          </a>
-          <a class="tool-card" href="tools/case-converter/index.html" style="--accent:#5cf8c8">
-            <span class="tool-icon">🔡</span>
-            <div class="tool-info">
-              <h3>Case Converter</h3>
-              <p>UPPER, lower, Title, camel, snake...</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/text-cleaner/index.html" style="--accent:#5cf8c8">
-            <span class="tool-icon">🧹</span>
-            <div class="tool-info">
-              <h3>Text Cleaner</h3>
-              <p>Remove duplicates, extra spaces, symbols</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/slug-generator/index.html" style="--accent:#5cf8c8">
-            <span class="tool-icon">🔗</span>
-            <div class="tool-info">
-              <h3>Slug Generator</h3>
-              <p>Convert text to URL-friendly slugs</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/lorem-ipsum/index.html" style="--accent:#5cf8c8">
-            <span class="tool-icon">📜</span>
-            <div class="tool-info">
-              <h3>Lorem Ipsum</h3>
-              <p>Generate placeholder text fast</p>
-            </div>
-          </a>
-        </div>
-      </section>
+				<div class="tools-grid">
 
-      <!-- Business Tools -->
-      <section class="category-section" id="cat-business">
-        <div class="section-head">
-          <div class="section-head-left">
-            <span class="section-icon" style="background:rgba(247,183,49,0.12);color:#f7b731;">📋</span>
-            <div>
-              <h2 class="section-title">Business Tools</h2>
-              <p class="section-sub">Professional tools — free forever, no signup</p>
-            </div>
-          </div>
-          <span class="section-count" style="color:#f7b731;">4 tools</span>
-        </div>
-        <div class="tools-grid">
-          <a class="tool-card" href="tools/invoice-generator/index.html" style="--accent:#f7b731">
-            <span class="tool-icon">🧾</span>
-            <div class="tool-info">
-              <h3>Invoice Generator</h3>
-              <p>Create & download professional invoices</p>
-            </div>
-            <span class="tool-tag">Free</span>
-          </a>
-          <a class="tool-card" href="tools/password-generator/index.html" style="--accent:#f7b731">
-            <span class="tool-icon">🔑</span>
-            <div class="tool-info">
-              <h3>Password Generator</h3>
-              <p>Generate strong secure passwords</p>
-            </div>
-            <span class="tool-tag hot">Popular</span>
-          </a>
-          <a class="tool-card" href="tools/password-checker/index.html" style="--accent:#f7b731">
-            <span class="tool-icon">🛡️</span>
-            <div class="tool-info">
-              <h3>Password Checker</h3>
-              <p>Test how strong your password is</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/privacy-policy/index.html" style="--accent:#f7b731">
-            <span class="tool-icon">📃</span>
-            <div class="tool-info">
-              <h3>Privacy Policy Generator</h3>
-              <p>Generate a policy for your website</p>
-            </div>
-          </a>
-        </div>
-      </section>
+					<a class="tool-card" href="tools/percentage-calculator/index.html" data-name="percentage calculator" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#EFF6FF; color:#2563EB;">%</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Percentage Calculator</div>
+						<div class="tool-card-desc">Calculate percentages, increases, decreases and ratios instantly.</div>
+					</a>
 
-      <!-- Everyday Tools -->
-      <section class="category-section" id="cat-everyday">
-        <div class="section-head">
-          <div class="section-head-left">
-            <span class="section-icon" style="background:rgba(69,170,242,0.12);color:#45aaf2;">🌍</span>
-            <div>
-              <h2 class="section-title">Everyday Tools</h2>
-              <p class="section-sub">Daily life calculators and generators</p>
-            </div>
-          </div>
-          <span class="section-count" style="color:#45aaf2;">5 tools</span>
-        </div>
-        <div class="tools-grid">
-          <a class="tool-card" href="tools/qr-generator/index.html" style="--accent:#45aaf2">
-            <span class="tool-icon">📱</span>
-            <div class="tool-info">
-              <h3>QR Code Generator</h3>
-              <p>Create QR codes for any link or text</p>
-            </div>
-            <span class="tool-tag hot">Popular</span>
-          </a>
-          <a class="tool-card" href="tools/emi-calculator/index.html" style="--accent:#45aaf2">
-            <span class="tool-icon">💰</span>
-            <div class="tool-info">
-              <h3>EMI Calculator</h3>
-              <p>Calculate monthly loan EMI instantly</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/age-calculator/index.html" style="--accent:#45aaf2">
-            <span class="tool-icon">🎂</span>
-            <div class="tool-info">
-              <h3>Age Calculator</h3>
-              <p>Find exact age from date of birth</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/bmi-calculator/index.html" style="--accent:#45aaf2">
-            <span class="tool-icon">⚖️</span>
-            <div class="tool-info">
-              <h3>BMI Calculator</h3>
-              <p>Calculate your Body Mass Index</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/unit-converter/index.html" style="--accent:#45aaf2">
-            <span class="tool-icon">📏</span>
-            <div class="tool-info">
-              <h3>Unit Converter</h3>
-              <p>Convert length, weight, temperature...</p>
-            </div>
-          </a>
-        </div>
-      </section>
+					<a class="tool-card" href="tools/discount-calculator/index.html" data-name="discount calculator sale price" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FFF7ED; color:#EA580C;">🏷️</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Discount Calculator</div>
+						<div class="tool-card-desc">Find how much you save with any discount or coupon deal.</div>
+					</a>
 
-      <!-- Developer Tools -->
-      <section class="category-section" id="cat-developer">
-        <div class="section-head">
-          <div class="section-head-left">
-            <span class="section-icon" style="background:rgba(253,150,68,0.12);color:#fd9644;">💻</span>
-            <div>
-              <h2 class="section-title">Developer Tools</h2>
-              <p class="section-sub">Tools every developer uses daily</p>
-            </div>
-          </div>
-          <span class="section-count" style="color:#fd9644;">4 tools</span>
-        </div>
-        <div class="tools-grid">
-          <a class="tool-card" href="tools/color-picker/index.html" style="--accent:#fd9644">
-            <span class="tool-icon">🎨</span>
-            <div class="tool-info">
-              <h3>Color Picker</h3>
-              <p>Pick colors — get HEX, RGB, HSL</p>
-            </div>
-            <span class="tool-tag hot">Popular</span>
-          </a>
-          <a class="tool-card" href="tools/json-formatter/index.html" style="--accent:#fd9644">
-            <span class="tool-icon">{ }</span>
-            <div class="tool-info">
-              <h3>JSON Formatter</h3>
-              <p>Format, minify and validate JSON</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/base64/index.html" style="--accent:#fd9644">
-            <span class="tool-icon">🔤</span>
-            <div class="tool-info">
-              <h3>Base64 Encoder</h3>
-              <p>Encode and decode Base64 strings</p>
-            </div>
-          </a>
-          <a class="tool-card" href="tools/regex-tester/index.html" style="--accent:#fd9644">
-            <span class="tool-icon">🔍</span>
-            <div class="tool-info">
-              <h3>Regex Tester</h3>
-              <p>Test regular expressions in real-time</p>
-            </div>
-          </a>
-        </div>
-      </section>
+					<a class="tool-card" href="tools/gst-calculator/index.html" data-name="gst calculator india tax" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#F0FDF4; color:#16A34A;">🧾</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">GST Calculator</div>
+						<div class="tool-card-desc">Calculate GST for any Indian tax slab — 5%, 12%, 18% or 28%.</div>
+					</a>
 
-    </div><!-- end categorySections -->
-  </main>
+					<a class="tool-card" href="tools/emi-calculator/index.html" data-name="emi calculator loan monthly" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#EFF6FF; color:#2563EB;">🏦</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">EMI Calculator</div>
+						<div class="tool-card-desc">Calculate monthly EMI for home, car or personal loans.</div>
+					</a>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-inner">
-      <span class="footer-logo">⚡ ToolZone</span>
-      <span class="footer-copy">All tools are free, forever. No signup. No watermarks.</span>
-    </div>
-  </footer>
+					<a class="tool-card" href="tools/sip-calculator/index.html" data-name="sip calculator investment mutual fund" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FDF4FF; color:#9333EA;">📈</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">SIP Calculator</div>
+						<div class="tool-card-desc">Estimate returns on your SIP mutual fund investments over time.</div>
+					</a>
 
-  <script src="script.js"></script>
-</body>
+					<a class="tool-card" href="tools/compound-interest-calculator/index.html" data-name="compound interest calculator savings growth" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FEFCE8; color:#CA8A04;">💰</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Compound Interest</div>
+						<div class="tool-card-desc">See how your savings grow with the power of compounding.</div>
+					</a>
+
+					<a class="tool-card" href="tools/age-calculator/index.html" data-name="age calculator birthday years" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FFF1F2; color:#E11D48;">🎂</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Age Calculator</div>
+						<div class="tool-card-desc">Find your exact age in years, months and days from your birthdate.</div>
+					</a>
+
+					<a class="tool-card" href="tools/date-difference-calculator/index.html" data-name="date difference calculator days between dates" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#EFF6FF; color:#2563EB;">📅</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Date Difference</div>
+						<div class="tool-card-desc">Calculate exact number of days between any two dates.</div>
+					</a>
+
+					<a class="tool-card" href="tools/bmi-calculator/index.html" data-name="bmi calculator body mass index health weight" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#F0FDF4; color:#16A34A;">⚖️</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">BMI Calculator</div>
+						<div class="tool-card-desc">Check your Body Mass Index and understand your weight category.</div>
+					</a>
+
+					<a class="tool-card" href="tools/calorie-calculator/index.html" data-name="calorie calculator diet nutrition daily" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FFF7ED; color:#EA580C;">🥗</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Calorie Calculator</div>
+						<div class="tool-card-desc">Estimate your daily calorie needs based on body and lifestyle.</div>
+					</a>
+
+					<a class="tool-card" href="tools/loan-eligibility-calculator/index.html" data-name="loan eligibility calculator bank amount" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FDF4FF; color:#9333EA;">📋</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Loan Eligibility</div>
+						<div class="tool-card-desc">Find out how much loan amount you are eligible for from a bank.</div>
+					</a>
+
+					<a class="tool-card" href="tools/salary-to-hourly-converter/index.html" data-name="salary hourly converter wage annual monthly" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FEFCE8; color:#CA8A04;">💼</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Salary to Hourly</div>
+						<div class="tool-card-desc">Convert your annual or monthly salary into an hourly wage rate.</div>
+					</a>
+
+					<a class="tool-card" href="tools/tip-calculator/index.html" data-name="tip calculator restaurant bill split" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FFF1F2; color:#E11D48;">🍽️</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Tip Calculator</div>
+						<div class="tool-card-desc">Split bills and calculate tips easily for any group size.</div>
+					</a>
+
+					<a class="tool-card" href="tools/fuel-cost-calculator/index.html" data-name="fuel cost calculator petrol diesel trip mileage" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#F0FDF4; color:#16A34A;">⛽</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Fuel Cost Calculator</div>
+						<div class="tool-card-desc">Estimate your trip fuel cost based on distance and mileage.</div>
+					</a>
+
+					<a class="tool-card" href="tools/electricity-bill-estimator/index.html" data-name="electricity bill estimator units power appliance" data-cat="calculators">
+						<div class="tool-card-top">
+							<div class="tool-icon" style="background:#FEFCE8; color:#CA8A04;">💡</div>
+							<div class="tool-card-arrow">
+								<svg viewBox="0 0 24 24">
+									<line x1="5" y1="12" x2="19" y2="12"/>
+									<polyline points="12 5 19 12 12 19"/>
+								</svg>
+							</div>
+						</div>
+						<div class="tool-card-name">Electricity Bill Estimator</div>
+						<div class="tool-card-desc">Estimate your monthly electricity bill based on your appliances.</div>
+					</a>
+
+				</div>
+			</section>
+
+			<div class="no-results" id="noResults">
+				<div class="no-results-icon">🔍</div>
+				<p>
+					No tools found for "<span id="noResultsQuery"></span>"
+				</p>
+				<small>Try a different keyword</small>
+			</div>
+
+		</main>
+
+		<!-- FOOTER -->
+		<footer>
+			<div class="footer-inner">
+				<div class="footer-top">
+					<div class="footer-brand">
+						<div class="footer-logo">
+							Tool<span>Zone</span>
+						</div>
+						<p>Free online tools for everyone. Built with ❤️ in India.</p>
+					</div>
+					<div class="footer-links">
+						<a href="#">About</a>
+						<a href="#">Privacy</a>
+						<a href="#">Contact</a>
+					</div>
+				</div>
+				<div class="footer-bottom">
+					<p>© 2025 ToolZone. All tools are free, forever.</p>
+				</div>
+			</div>
+		</footer>
+
+		<script src="script.js"></script>
+	</body>
 </html>

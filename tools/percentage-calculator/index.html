@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Percentage Calculator – ToolZone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <a href="../../index.html" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <span class="logo-text">Tool<span>Zone</span></span>
+      </a>
+      <nav>
+        <a href="../../index.html">← All Tools</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../../index.html">Home</a>
+      <span class="bc-sep">›</span>
+      <a href="../../index.html">Calculators</a>
+      <span class="bc-sep">›</span>
+      <span>Percentage Calculator</span>
+    </div>
+  </div>
+
+  <!-- TOOL HERO -->
+  <section class="tool-hero">
+    <div class="tool-hero-inner">
+      <div class="tool-hero-left">
+        <div class="tool-badge">Calculator Tools</div>
+        <h1>Percentage Calculator</h1>
+        <p>6 powerful percentage calculation modes. Find percentages, calculate changes, reverse-calculate values, and more — all in real time.</p>
+        <div class="tool-meta">
+          <div class="meta-item">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Real-time results
+          </div>
+          <div class="meta-item">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            100% Accurate
+          </div>
+          <div class="meta-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Formula shown
+          </div>
+        </div>
+      </div>
+      <div class="tool-hero-icon">%</div>
+    </div>
+  </section>
+
+  <!-- MODE TABS -->
+  <div class="mode-tabs-wrap">
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="0">What is X% of Y?</button>
+      <button class="mode-tab" data-mode="1">X is what % of Y?</button>
+      <button class="mode-tab" data-mode="2">% Change</button>
+      <button class="mode-tab" data-mode="3">Increase / Decrease</button>
+      <button class="mode-tab" data-mode="4">Reverse %</button>
+      <button class="mode-tab" data-mode="5">% Difference</button>
+    </div>
+  </div>
+
+  <!-- MAIN CALCULATOR -->
+  <main class="calc-main">
+
+    <!-- MODE 0 -->
+    <div class="calc-panel active" id="panel-0">
+      <div class="panel-grid">
+        <div class="input-card">
+          <div class="input-card-header">
+            <h2>What is <em>X%</em> of <em>Y</em>?</h2>
+            <p>Find a percentage of any number</p>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>Percentage (X)</label>
+              <div class="input-wrap">
+                <input type="number" id="m0-pct" placeholder="e.g. 20" inputmode="decimal"/>
+                <span class="input-unit">%</span>
+              </div>
+            </div>
+            <div class="field-connector">of</div>
+            <div class="field">
+              <label>Total Value (Y)</label>
+              <div class="input-wrap">
+                <input type="number" id="m0-total" placeholder="e.g. 500" inputmode="decimal"/>
+              </div>
+            </div>
+          </div>
+          <button class="clear-btn" onclick="clearPanel(0)">Clear</button>
+        </div>
+        <div class="result-card" id="result-0">
+          <div class="result-placeholder">
+            <div class="placeholder-icon">%</div>
+            <p>Enter values to see result</p>
+          </div>
+          <div class="result-content" style="display:none">
+            <div class="result-label">Result</div>
+            <div class="result-value" id="r0-value">—</div>
+            <div class="result-equation" id="r0-eq"></div>
+            <button class="copy-btn" onclick="copyResult('r0-value', this)">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Result
+            </button>
+            <div class="formula-box">
+              <div class="formula-label">Formula Used</div>
+              <div class="formula-text" id="r0-formula"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE 1 -->
+    <div class="calc-panel" id="panel-1">
+      <div class="panel-grid">
+        <div class="input-card">
+          <div class="input-card-header">
+            <h2><em>X</em> is what <em>%</em> of <em>Y</em>?</h2>
+            <p>Find what percentage one number is of another</p>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>Value (X)</label>
+              <div class="input-wrap">
+                <input type="number" id="m1-val" placeholder="e.g. 50" inputmode="decimal"/>
+              </div>
+            </div>
+            <div class="field-connector">out of</div>
+            <div class="field">
+              <label>Total (Y)</label>
+              <div class="input-wrap">
+                <input type="number" id="m1-total" placeholder="e.g. 200" inputmode="decimal"/>
+              </div>
+            </div>
+          </div>
+          <button class="clear-btn" onclick="clearPanel(1)">Clear</button>
+        </div>
+        <div class="result-card" id="result-1">
+          <div class="result-placeholder">
+            <div class="placeholder-icon">%</div>
+            <p>Enter values to see result</p>
+          </div>
+          <div class="result-content" style="display:none">
+            <div class="result-label">Result</div>
+            <div class="result-value" id="r1-value">—</div>
+            <div class="result-equation" id="r1-eq"></div>
+            <button class="copy-btn" onclick="copyResult('r1-value', this)">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Result
+            </button>
+            <div class="formula-box">
+              <div class="formula-label">Formula Used</div>
+              <div class="formula-text" id="r1-formula"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE 2 -->
+    <div class="calc-panel" id="panel-2">
+      <div class="panel-grid">
+        <div class="input-card">
+          <div class="input-card-header">
+            <h2>Percentage <em>Change</em></h2>
+            <p>Calculate % increase or decrease from one value to another</p>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>Original Value</label>
+              <div class="input-wrap">
+                <input type="number" id="m2-from" placeholder="e.g. 200" inputmode="decimal"/>
+              </div>
+            </div>
+            <div class="field-connector">→</div>
+            <div class="field">
+              <label>New Value</label>
+              <div class="input-wrap">
+                <input type="number" id="m2-to" placeholder="e.g. 250" inputmode="decimal"/>
+              </div>
+            </div>
+          </div>
+          <button class="clear-btn" onclick="clearPanel(2)">Clear</button>
+        </div>
+        <div class="result-card" id="result-2">
+          <div class="result-placeholder">
+            <div class="placeholder-icon">%</div>
+            <p>Enter values to see result</p>
+          </div>
+          <div class="result-content" style="display:none">
+            <div class="result-label">Percentage Change</div>
+            <div class="result-value" id="r2-value">—</div>
+            <div class="result-equation" id="r2-eq"></div>
+            <div class="change-badge" id="r2-badge"></div>
+            <button class="copy-btn" onclick="copyResult('r2-value', this)">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Result
+            </button>
+            <div class="formula-box">
+              <div class="formula-label">Formula Used</div>
+              <div class="formula-text" id="r2-formula"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE 3 -->
+    <div class="calc-panel" id="panel-3">
+      <div class="panel-grid">
+        <div class="input-card">
+          <div class="input-card-header">
+            <h2>Increase / Decrease by <em>%</em></h2>
+            <p>Apply a percentage increase or decrease to a value</p>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>Original Value</label>
+              <div class="input-wrap">
+                <input type="number" id="m3-val" placeholder="e.g. 1000" inputmode="decimal"/>
+              </div>
+            </div>
+            <div class="field-connector">by</div>
+            <div class="field">
+              <label>Percentage</label>
+              <div class="input-wrap">
+                <input type="number" id="m3-pct" placeholder="e.g. 15" inputmode="decimal"/>
+                <span class="input-unit">%</span>
+              </div>
+            </div>
+          </div>
+          <div class="toggle-group">
+            <label class="toggle-label">Operation</label>
+            <div class="toggle-btns">
+              <button class="toggle-btn active" id="m3-inc" onclick="setToggle(3,'increase')">▲ Increase</button>
+              <button class="toggle-btn" id="m3-dec" onclick="setToggle(3,'decrease')">▼ Decrease</button>
+            </div>
+          </div>
+          <button class="clear-btn" onclick="clearPanel(3)">Clear</button>
+        </div>
+        <div class="result-card" id="result-3">
+          <div class="result-placeholder">
+            <div class="placeholder-icon">%</div>
+            <p>Enter values to see result</p>
+          </div>
+          <div class="result-content" style="display:none">
+            <div class="result-label">New Value</div>
+            <div class="result-value" id="r3-value">—</div>
+            <div class="result-equation" id="r3-eq"></div>
+            <button class="copy-btn" onclick="copyResult('r3-value', this)">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Result
+            </button>
+            <div class="formula-box">
+              <div class="formula-label">Formula Used</div>
+              <div class="formula-text" id="r3-formula"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE 4 -->
+    <div class="calc-panel" id="panel-4">
+      <div class="panel-grid">
+        <div class="input-card">
+          <div class="input-card-header">
+            <h2><em>X</em> is <em>Y%</em> of what number?</h2>
+            <p>Find the original number when you know a percentage of it</p>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>Known Value (X)</label>
+              <div class="input-wrap">
+                <input type="number" id="m4-val" placeholder="e.g. 80" inputmode="decimal"/>
+              </div>
+            </div>
+            <div class="field-connector">is</div>
+            <div class="field">
+              <label>Percentage (Y)</label>
+              <div class="input-wrap">
+                <input type="number" id="m4-pct" placeholder="e.g. 40" inputmode="decimal"/>
+                <span class="input-unit">%</span>
+              </div>
+            </div>
+          </div>
+          <button class="clear-btn" onclick="clearPanel(4)">Clear</button>
+        </div>
+        <div class="result-card" id="result-4">
+          <div class="result-placeholder">
+            <div class="placeholder-icon">%</div>
+            <p>Enter values to see result</p>
+          </div>
+          <div class="result-content" style="display:none">
+            <div class="result-label">Original Number</div>
+            <div class="result-value" id="r4-value">—</div>
+            <div class="result-equation" id="r4-eq"></div>
+            <button class="copy-btn" onclick="copyResult('r4-value', this)">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Result
+            </button>
+            <div class="formula-box">
+              <div class="formula-label">Formula Used</div>
+              <div class="formula-text" id="r4-formula"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODE 5 -->
+    <div class="calc-panel" id="panel-5">
+      <div class="panel-grid">
+        <div class="input-card">
+          <div class="input-card-header">
+            <h2>Percentage <em>Difference</em></h2>
+            <p>Find % difference between two values (no direction bias)</p>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <label>Value A</label>
+              <div class="input-wrap">
+                <input type="number" id="m5-a" placeholder="e.g. 40" inputmode="decimal"/>
+              </div>
+            </div>
+            <div class="field-connector">vs</div>
+            <div class="field">
+              <label>Value B</label>
+              <div class="input-wrap">
+                <input type="number" id="m5-b" placeholder="e.g. 60" inputmode="decimal"/>
+              </div>
+            </div>
+          </div>
+          <button class="clear-btn" onclick="clearPanel(5)">Clear</button>
+        </div>
+        <div class="result-card" id="result-5">
+          <div class="result-placeholder">
+            <div class="placeholder-icon">%</div>
+            <p>Enter values to see result</p>
+          </div>
+          <div class="result-content" style="display:none">
+            <div class="result-label">Percentage Difference</div>
+            <div class="result-value" id="r5-value">—</div>
+            <div class="result-equation" id="r5-eq"></div>
+            <button class="copy-btn" onclick="copyResult('r5-value', this)">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Result
+            </button>
+            <div class="formula-box">
+              <div class="formula-label">Formula Used</div>
+              <div class="formula-text" id="r5-formula"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">Tool<span>Zone</span></div>
+          <p>Free online tools for everyone. Built with ❤️ in India.</p>
+        </div>
+        <div class="footer-links">
+          <a href="#">About</a>
+          <a href="#">Privacy</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 ToolZone. All tools are free, forever.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

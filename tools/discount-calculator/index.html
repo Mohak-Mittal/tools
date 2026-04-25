@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+		<title>Discount Calculator – ToolZone</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+		<link rel="stylesheet" href="style.css"/>
+	</head>
+	<body>
+
+		<!-- HEADER -->
+		<header>
+			<div class="header-inner">
+				<a href="../../index.html" class="logo">
+					<div class="logo-icon">
+						<svg viewBox="0 0 24 24">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+							<polyline points="14 2 14 8 20 8"/>
+							<line x1="16" y1="13" x2="8" y2="13"/>
+							<line x1="16" y1="17" x2="8" y2="17"/>
+						</svg>
+					</div>
+					<span class="logo-text">
+						Tool<span>Zone</span>
+					</span>
+				</a>
+				<nav>
+					<a href="../../index.html">← All Tools</a>
+				</nav>
+			</div>
+		</header>
+
+		<!-- BREADCRUMB -->
+		<div class="breadcrumb">
+			<div class="breadcrumb-inner">
+				<a href="../../index.html">Home</a>
+				<span class="bc-sep">›</span>
+				<a href="../../index.html">Calculators</a>
+				<span class="bc-sep">›</span>
+				<span>Discount Calculator</span>
+			</div>
+		</div>
+
+		<!-- TOOL HERO -->
+		<section class="tool-hero">
+			<div class="tool-hero-inner">
+				<div class="tool-hero-left">
+					<div class="tool-badge">Calculator Tools</div>
+					<h1>Discount Calculator</h1>
+					<p>6 powerful discount modes. Find sale prices, savings, original prices, reverse discounts, double discounts and best deal comparisons — all in real time.</p>
+					<div class="tool-meta">
+						<div class="meta-item">
+							<svg viewBox="0 0 24 24">
+								<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+							</svg>
+							Real-time results
+						</div>
+						<div class="meta-item">
+							<svg viewBox="0 0 24 24">
+								<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+							</svg>
+							100% Accurate
+						</div>
+						<div class="meta-item">
+							<svg viewBox="0 0 24 24">
+								<circle cx="12" cy="12" r="10"/>
+								<line x1="12" y1="8" x2="12" y2="12"/>
+								<line x1="12" y1="16" x2="12.01" y2="16"/>
+							</svg>
+							Instant savings
+						</div>
+					</div>
+				</div>
+				<div class="tool-hero-icon">🏷️</div>
+			</div>
+		</section>
+
+		<!-- MODE TABS -->
+		<div class="mode-tabs-wrap">
+			<div class="mode-tabs">
+				<button class="mode-tab active" data-mode="0">Sale Price</button>
+				<button class="mode-tab" data-mode="1">You Save</button>
+				<button class="mode-tab" data-mode="2">Original Price</button>
+				<button class="mode-tab" data-mode="3">Discount %</button>
+				<button class="mode-tab" data-mode="4">Double Discount</button>
+				<button class="mode-tab" data-mode="5">Best Deal</button>
+			</div>
+		</div>
+
+		<!-- MAIN CALCULATOR -->
+		<main class="calc-main">
+
+			<!-- MODE 0: Sale Price -->
+			<div class="calc-panel active" id="panel-0">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								What is the <em>Sale Price</em>?
+							</h2>
+							<p>Find the final price after applying a discount</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Original Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m0-price" placeholder="e.g. 2000" inputmode="decimal"/>
+								</div>
+							</div>
+							<div class="field-connector">−</div>
+							<div class="field">
+								<label>Discount</label>
+								<div class="input-wrap">
+									<input type="number" id="m0-disc" placeholder="e.g. 20" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(0)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-0">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🏷️</div>
+							<p>Enter values to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Sale Price</div>
+									<div class="result-value green" id="r0-sale"></div>
+								</div>
+								<div>
+									<div class="result-label">You Save</div>
+									<div class="result-value red" id="r0-save"></div>
+								</div>
+							</div>
+							<div class="result-eq" id="r0-eq"></div>
+							<div class="savings-bar-wrap">
+								<div class="savings-bar-track">
+									<div class="savings-bar-fill" id="r0-bar"></div>
+								</div>
+								<div class="savings-bar-labels">
+									<span>You Pay</span>
+									<span>You Save</span>
+								</div>
+							</div>
+							<button class="copy-btn" onclick="copyResult('r0-sale', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Sale Price
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 1: You Save -->
+			<div class="calc-panel" id="panel-1">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								How much do <em>You Save</em>?
+							</h2>
+							<p>Find the exact amount saved with a discount</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Original Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m1-price" placeholder="e.g. 5000" inputmode="decimal"/>
+								</div>
+							</div>
+							<div class="field-connector">×</div>
+							<div class="field">
+								<label>Discount</label>
+								<div class="input-wrap">
+									<input type="number" id="m1-disc" placeholder="e.g. 35" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(1)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-1">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🏷️</div>
+							<p>Enter values to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Amount Saved</div>
+									<div class="result-value red" id="r1-save"></div>
+								</div>
+								<div>
+									<div class="result-label">You Pay</div>
+									<div class="result-value green" id="r1-pay"></div>
+								</div>
+							</div>
+							<div class="result-eq" id="r1-eq"></div>
+							<div class="savings-bar-wrap">
+								<div class="savings-bar-track">
+									<div class="savings-bar-fill" id="r1-bar"></div>
+								</div>
+								<div class="savings-bar-labels">
+									<span>You Pay</span>
+									<span>You Save</span>
+								</div>
+							</div>
+							<button class="copy-btn" onclick="copyResult('r1-save', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Savings
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 2: Original Price -->
+			<div class="calc-panel" id="panel-2">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								What was the <em>Original Price</em>?
+							</h2>
+							<p>Find the MRP when you know the sale price and discount</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Sale Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m2-sale" placeholder="e.g. 1600" inputmode="decimal"/>
+								</div>
+							</div>
+							<div class="field-connector">at</div>
+							<div class="field">
+								<label>Discount Applied</label>
+								<div class="input-wrap">
+									<input type="number" id="m2-disc" placeholder="e.g. 20" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(2)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-2">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🏷️</div>
+							<p>Enter values to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Original Price (MRP)</div>
+									<div class="result-value" id="r2-orig"></div>
+								</div>
+								<div>
+									<div class="result-label">Amount Saved</div>
+									<div class="result-value red" id="r2-save"></div>
+								</div>
+							</div>
+							<div class="result-eq" id="r2-eq"></div>
+							<button class="copy-btn" onclick="copyResult('r2-orig', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Original Price
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 3: Discount % -->
+			<div class="calc-panel" id="panel-3">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								What <em>Discount %</em> was applied?
+							</h2>
+							<p>Find the discount percentage from original and sale price</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Original Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m3-orig" placeholder="e.g. 2000" inputmode="decimal"/>
+								</div>
+							</div>
+							<div class="field-connector">→</div>
+							<div class="field">
+								<label>Sale Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m3-sale" placeholder="e.g. 1500" inputmode="decimal"/>
+								</div>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(3)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-3">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🏷️</div>
+							<p>Enter values to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row">
+								<div>
+									<div class="result-label">Discount Applied</div>
+									<div class="result-value red" id="r3-disc"></div>
+								</div>
+								<div>
+									<div class="result-label">Amount Saved</div>
+									<div class="result-value" id="r3-save"></div>
+								</div>
+							</div>
+							<div class="result-eq" id="r3-eq"></div>
+							<div class="savings-bar-wrap">
+								<div class="savings-bar-track">
+									<div class="savings-bar-fill" id="r3-bar"></div>
+								</div>
+								<div class="savings-bar-labels">
+									<span>You Pay</span>
+									<span>You Save</span>
+								</div>
+							</div>
+							<button class="copy-btn" onclick="copyResult('r3-disc', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Discount %
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 4: Double Discount -->
+			<div class="calc-panel" id="panel-4">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								<em>Double Discount</em> Calculator
+							</h2>
+							<p>Apply two successive discounts — e.g. 30% off then extra 10% off</p>
+						</div>
+						<div class="field-group">
+							<div class="field">
+								<label>Original Price (₹)</label>
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m4-price" placeholder="e.g. 3000" inputmode="decimal"/>
+								</div>
+							</div>
+						</div>
+						<div class="field-group two-disc">
+							<div class="field">
+								<label>First Discount</label>
+								<div class="input-wrap">
+									<input type="number" id="m4-d1" placeholder="e.g. 30" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+							<div class="field-connector">then</div>
+							<div class="field">
+								<label>Second Discount</label>
+								<div class="input-wrap">
+									<input type="number" id="m4-d2" placeholder="e.g. 10" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+						</div>
+						<button class="clear-btn" onclick="clearPanel(4)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-4">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🏷️</div>
+							<p>Enter values to see result</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-row three-col">
+								<div>
+									<div class="result-label">Final Price</div>
+									<div class="result-value green" id="r4-final"></div>
+								</div>
+								<div>
+									<div class="result-label">Total Saved</div>
+									<div class="result-value red" id="r4-saved"></div>
+								</div>
+								<div>
+									<div class="result-label">Effective Discount</div>
+									<div class="result-value" id="r4-eff"></div>
+								</div>
+							</div>
+							<div class="double-disc-steps" id="r4-steps"></div>
+							<div class="result-eq" id="r4-eq"></div>
+							<button class="copy-btn" onclick="copyResult('r4-final', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Final Price
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODE 5: Best Deal -->
+			<div class="calc-panel" id="panel-5">
+				<div class="panel-grid">
+					<div class="input-card">
+						<div class="input-card-header">
+							<h2>
+								Which is the <em>Best Deal</em>?
+							</h2>
+							<p>Compare up to 3 products and find which gives the best value</p>
+						</div>
+
+						<div class="deal-row">
+							<div class="deal-label">Product A</div>
+							<div class="deal-fields">
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m5-a-price" placeholder="Price" inputmode="decimal"/>
+								</div>
+								<div class="input-wrap">
+									<input type="number" id="m5-a-disc" placeholder="Disc %" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="deal-row">
+							<div class="deal-label">Product B</div>
+							<div class="deal-fields">
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m5-b-price" placeholder="Price" inputmode="decimal"/>
+								</div>
+								<div class="input-wrap">
+									<input type="number" id="m5-b-disc" placeholder="Disc %" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="deal-row">
+							<div class="deal-label">Product C</div>
+							<div class="deal-fields">
+								<div class="input-wrap">
+									<span class="input-prefix">₹</span>
+									<input type="number" id="m5-c-price" placeholder="Price" inputmode="decimal"/>
+								</div>
+								<div class="input-wrap">
+									<input type="number" id="m5-c-disc" placeholder="Disc %" inputmode="decimal"/>
+									<span class="input-unit">%</span>
+								</div>
+							</div>
+						</div>
+
+						<button class="clear-btn" onclick="clearPanel(5)">Clear</button>
+					</div>
+
+					<div class="result-card" id="result-5">
+						<div class="result-placeholder">
+							<div class="placeholder-icon">🏷️</div>
+							<p>Enter at least 2 products to compare</p>
+						</div>
+						<div class="result-content" style="display:none">
+							<div class="result-label">Best Deal</div>
+							<div class="result-value green" id="r5-winner"></div>
+							<div class="result-eq" id="r5-eq"></div>
+							<div class="deal-comparison" id="r5-table"></div>
+							<button class="copy-btn" onclick="copyResult('r5-winner', this)">
+								<svg viewBox="0 0 24 24">
+									<rect x="9" y="9" width="13" height="13" rx="2"/>
+									<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+								</svg>
+								Copy Winner
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</main>
+
+		<!-- FOOTER -->
+		<footer>
+			<div class="footer-inner">
+				<div class="footer-top">
+					<div class="footer-brand">
+						<div class="footer-logo">
+							Tool<span>Zone</span>
+						</div>
+						<p>Free online tools for everyone. Built with ❤️ in India.</p>
+					</div>
+					<div class="footer-links">
+						<a href="#">About</a>
+						<a href="#">Privacy</a>
+						<a href="#">Contact</a>
+					</div>
+				</div>
+				<div class="footer-bottom">
+					<p>© 2025 ToolZone. All tools are free, forever.</p>
+				</div>
+			</div>
+		</footer>
+
+		<script src="script.js"></script>
+	</body>
+</html>
